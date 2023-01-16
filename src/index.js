@@ -1,34 +1,29 @@
-import './style.css'
-import * as THREE from 'three'
+import "./style.css"
+import * as THREE from "three"
+import { GlobalGUI } from "./utils/gui"
 
-// Scene 
+// Scene
 const scene = new THREE.Scene()
 
-// Simple cube
-const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({
-    color: 0xff0000
-})
-const mesh = new THREE.Mesh(geometry, material) 
-scene.add(mesh)
+// GUI
+const snowGUI = new GlobalGUI()
+snowGUI.addParam("count", 1000)
+snowGUI.add(snowGUI.params, "count").min(100).max(10000).step(100)
 
 // Sizes
 const sizes = {
     width: 800,
-    height: 600
+    height: 600,
 }
 
 // Camera
-const camera = new THREE.PerspectiveCamera(
-    75,
-    sizes.width / sizes.height
-)
-camera.position.z = 3    
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
+camera.position.z = 3
 scene.add(camera)
 
-// Renderer    
+// Renderer
 const renderer = new THREE.WebGLRenderer({
-    canvas: document.querySelector('canvas.webgl')
+    canvas: document.querySelector("canvas.webgl"),
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.render(scene, camera)
@@ -47,7 +42,7 @@ const tick = () => {
     // Render again
     renderer.render(scene, camera)
 
-    // Request the next frame and call tick in it 
+    // Request the next frame and call tick in it
     requestAnimationFrame(tick)
 }
 

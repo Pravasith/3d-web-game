@@ -1,11 +1,13 @@
 import GUI from "lil-gui"
 
-const gui = new GUI()
-
-class GlobalGuiParameters {
+export class GlobalGUI extends GUI {
     parameters = {}
 
-    add(param, value) {
+    addParam(param, value) {
         this.parameters[param] = value
+    }
+
+    get params() {
+        return this.parameters
     }
 }
