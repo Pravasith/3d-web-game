@@ -1,5 +1,6 @@
 import "./style.css"
 import * as THREE from "three"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { snowFall } from "./snow"
 
 // Scene
@@ -12,18 +13,29 @@ const sizes = {
 }
 
 // Camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
+const camera = new THREE.PerspectiveCamera(
+    75,
+    sizes.width / sizes.height,
+    0.5,
+    100
+)
 camera.position.z = 3
 scene.add(camera)
 
+// Canvas
+const canvas = document.querySelector("canvas.webgl")
+
+// Controls
+const controls = new OrbitControls(camera, canvas)
+
 // Renderer
 const renderer = new THREE.WebGLRenderer({
-    canvas: document.querySelector("canvas.webgl"),
+    canvas,
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.render(scene, camera)
 
-snowFall()
+snowFall(scene)
 
 // Clock
 const clock = new THREE.Clock()
