@@ -1,14 +1,9 @@
 import "./style.css"
 import * as THREE from "three"
-import { GlobalGUI } from "./utils/gui"
+import { snowFall } from "./snow"
 
 // Scene
 const scene = new THREE.Scene()
-
-// GUI
-const snowGUI = new GlobalGUI()
-snowGUI.addParam("count", 1000)
-snowGUI.add(snowGUI.params, "count").min(100).max(10000).step(100)
 
 // Sizes
 const sizes = {
@@ -28,6 +23,8 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.render(scene, camera)
 
+snowFall()
+
 // Clock
 const clock = new THREE.Clock()
 
@@ -35,9 +32,6 @@ const clock = new THREE.Clock()
 const tick = () => {
     // Get elapsed Time
     const elapsedTime = clock.getElapsedTime()
-
-    // Update Objects
-    mesh.rotation.y = elapsedTime
 
     // Render again
     renderer.render(scene, camera)
