@@ -4,7 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { snowFall } from "./snow"
 
 // Scene
-const scene = new THREE.Scene()
+export const scene = new THREE.Scene()
 
 // Sizes
 const sizes = {
@@ -35,7 +35,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.render(scene, camera)
 
-snowFall(scene)
+snowFall()
 
 // Clock
 const clock = new THREE.Clock()

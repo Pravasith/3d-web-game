@@ -1,5 +1,6 @@
 import * as THREE from "three"
 import { GlobalGUI } from "../utils/gui"
+import { scene } from "../"
 
 // GUI
 const snowGUI = new GlobalGUI({
@@ -9,8 +10,18 @@ const snowGUI = new GlobalGUI({
 // GUI
 const { params } = snowGUI
 
-export const snowFall = scene => {
-    const geometry = new THREE.BufferGeometry()
+let geometry = null
+let material = null
+let points = null
+
+export const snowFall = () => {
+    if (points !== null) {
+        geometry.dispose()
+        material.dispose()
+        scene.remove(points)
+    }
+
+    geometry = new THREE.BufferGeometry()
 
     const positions = new Float32Array(params.count * 3)
 
@@ -24,20 +35,28 @@ export const snowFall = scene => {
 
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3))
 
-    const material = new THREE.PointsMaterial({
+    material = new THREE.PointsMaterial({
         size: params.size,
         sizeAttenuation: true,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
     })
 
-    const points = new THREE.Points(geometry, material)
+    points = new THREE.Points(geometry, material)
     scene.add(points)
 }
 
-snowGUI.addParam("count", 10000)
+snowGUI.addParam("count", 1000)
 snowGUI.addParam("size", 0.02)
-snowGUI.add(params, "count").min(100).max(10000).step(100)
-// .onFinishChange(snowFall)
-snowGUI.add(params, "size").min(0.01).max(10).step(0.001)
-// .onFinishChange(snowFall)
+snowGUI
+    .add(params, "count")
+    .min(100)
+    .max(10000)
+    .step(100)
+    .onFinishChange(snowFall)
+snowGUI
+    .add(params, "size")
+    .min(0.01)
+    .max(0.1)
+    .step(0.001)
+    .onFinishChange(snowFall)
