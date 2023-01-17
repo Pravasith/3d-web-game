@@ -28,9 +28,9 @@ export const snowFall = () => {
     for (let i = 0; i < params.count; i++) {
         const vertex = i * 3
 
-        positions[vertex + 0] = (Math.random() - 0.5) * 3
-        positions[vertex + 1] = (Math.random() - 0.5) * 3
-        positions[vertex + 2] = (Math.random() - 0.5) * 3
+        positions[vertex + 0] = (i / params.count) * 20 
+        positions[vertex + 1] = Math.sin(positions[vertex + 0] * 10) * 0.02 * Math.pow(positions[vertex + 0], 2) 
+        positions[vertex + 2] = Math.cos(positions[vertex + 0] * 10) * 0.02 * Math.pow(positions[vertex + 0], 2) 
     }
 
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3))
