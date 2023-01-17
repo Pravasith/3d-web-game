@@ -38,7 +38,7 @@ renderer.render(scene, camera)
 snowFall()
 
 // Clock
-const clock = new THREE.Clock()
+export const clock = new THREE.Clock()
 
 // Animations
 const tick = () => {
