@@ -17,9 +17,9 @@ const camera = new THREE.PerspectiveCamera(
     75,
     sizes.width / sizes.height,
     0.5,
-    100
+    800
 )
-camera.position.z = 3
+camera.position.z = 8
 scene.add(camera)
 
 // Canvas
