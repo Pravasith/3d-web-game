@@ -1,7 +1,8 @@
 import "./style.css"
 import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { snowFall } from "./snow"
+import { GlobalGUI } from "./utils/gui"
+// import { snowFall } from "./snow"
 
 // Scene
 export const scene = new THREE.Scene()
@@ -11,6 +12,61 @@ const sizes = {
     width: 800,
     height: 600,
 }
+
+// GUI
+const lightsGUI = new GlobalGUI({
+    width: 400,
+})
+
+// GUI
+const { params } = lightsGUI
+console.log({ params })
+
+lightsGUI.addParam("intensity", 7)
+lightsGUI.addParam("x", 1)
+lightsGUI.addParam("y", 1)
+lightsGUI.addParam("z", 1)
+lightsGUI
+    .add(params, "intensity")
+    .name("Light Intensity")
+    .min(0)
+    .max(10)
+    .step(0.001)
+    .onFinishChange(() => {
+        directionalLight.intensity = params.intensity
+    })
+lightsGUI
+    .add(params, "x")
+    .name("Light X")
+    .min(-5)
+    .max(5)
+    .step(0.01)
+    .onFinishChange(() => {
+        directionalLight.position.x = params.x
+    })
+lightsGUI
+    .add(params, "y")
+    .name("Light Y")
+    .min(-5)
+    .max(5)
+    .step(0.01)
+    .onFinishChange(() => {
+        directionalLight.position.y = params.y
+    })
+lightsGUI
+    .add(params, "z")
+    .name("Light Z")
+    .min(-5)
+    .max(5)
+    .step(0.01)
+    .onFinishChange(() => {
+        directionalLight.position.z = params.z
+    })
+
+// Lights
+const directionalLight = new THREE.DirectionalLight("#ffffff", params.intensity)
+directionalLight.position.set(0.25, 3, -2.25)
+scene.add(directionalLight)
 
 // Camera
 const camera = new THREE.PerspectiveCamera(
@@ -35,7 +91,12 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.render(scene, camera)
 
-snowFall()
+// snowFall()
+const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 32, 32),
+    new THREE.MeshStandardMaterial()
+)
+scene.add(sphere)
 
 // Clock
 export const clock = new THREE.Clock()
