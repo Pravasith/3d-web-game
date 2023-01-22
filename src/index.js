@@ -2,7 +2,11 @@ import "./style.css"
 import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { GlobalGUI } from "./utils/gui"
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 // import { snowFall } from "./snow"
+
+const gltfLoader = new GLTFLoader()
+
 
 // Scene
 export const scene = new THREE.Scene()
@@ -13,14 +17,21 @@ const sizes = {
     height: 600,
 }
 
+// Models
+gltfLoader.load(
+    '/models/street-art.gltf',
+    (gltf) => {
+        console.log(gltf)
+        scene.add(gltf.scene)
+    }
+)
+
 // GUI
 const lightsGUI = new GlobalGUI({
     width: 400,
 })
 
-// GUI
 const { params } = lightsGUI
-console.log({ params })
 
 lightsGUI.addParam("intensity", 7)
 lightsGUI.addParam("x", 1)
@@ -64,9 +75,11 @@ lightsGUI
     })
 
 // Lights
+const ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
 const directionalLight = new THREE.DirectionalLight("#ffffff", params.intensity)
 directionalLight.position.set(0.25, 3, -2.25)
-scene.add(directionalLight)
+scene.add(directionalLight, ambientLight)
+
 
 // Camera
 const camera = new THREE.PerspectiveCamera(
@@ -90,6 +103,7 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.render(scene, camera)
+renderer.physicallyCorrectLights = true
 
 // snowFall()
 const sphere = new THREE.Mesh(
