@@ -27,11 +27,14 @@ export const snowFall = () => {
 
     for (let i = 0; i < params.count; i++) {
         const vertex = i * 3
+        
+        positions[vertex + 0] = (Math.random() - 0.5) * 20
+        positions[vertex + 1] = i * 0.05
+        positions[vertex + 2] = (Math.random() - 0.5) * 20
 
-        positions[vertex + 0] = Math.sin(i  / params.count) * params.power * Math.random() * 5
         // positions[vertex + 0] *= positions[vertex + 0] 
-        positions[vertex + 1] = Math.sin(positions[vertex + 0] * 20) * 0.001 * i  
-        positions[vertex + 2] = Math.cos(positions[vertex + 0] * 20) * 0.001 * i
+        // positions[vertex + 1] = Math.sin(positions[vertex + 0] * 20) * 0.001 * i  
+        // positions[vertex + 2] = Math.cos(positions[vertex + 0] * 20) * 0.001 * i
 
     }
 
@@ -40,17 +43,19 @@ export const snowFall = () => {
     material = new THREE.PointsMaterial({
         size: params.size,
         sizeAttenuation: true,
-        depthWrite: false,
+        depthWrite: true,
         blending: THREE.AdditiveBlending,
     })
 
     points = new THREE.Points(geometry, material)
     scene.add(points)
+
+    return points
    
 }
 
 snowGUI.addParam("count", 8000)
-snowGUI.addParam("size", 0.02)
+snowGUI.addParam("size", 0.1)
 snowGUI.addParam("power", 2)
 snowGUI
     .add(params, "count")

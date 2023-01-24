@@ -3,7 +3,7 @@ import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { GlobalGUI } from "./utils/gui"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
-// import { snowFall } from "./snow"
+import { snowFall } from "./snow"
 
 const gltfLoader = new GLTFLoader()
 
@@ -34,9 +34,9 @@ const lightsGUI = new GlobalGUI({
 const { params } = lightsGUI
 
 lightsGUI.addParam("intensity", 7)
-lightsGUI.addParam("x", 1)
-lightsGUI.addParam("y", 1)
-lightsGUI.addParam("z", 1)
+lightsGUI.addParam("x", -3.79)
+lightsGUI.addParam("y", 5)
+lightsGUI.addParam("z", 0.65)
 lightsGUI
     .add(params, "intensity")
     .name("Light Intensity")
@@ -77,7 +77,7 @@ lightsGUI
 // Lights
 const ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
 const directionalLight = new THREE.DirectionalLight("#ffffff", params.intensity)
-directionalLight.position.set(0.25, 3, -2.25)
+directionalLight.position.set(params.x, params.y, params.z)
 scene.add(directionalLight, ambientLight)
 
 
@@ -105,12 +105,13 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.render(scene, camera)
 renderer.physicallyCorrectLights = true
 
-// snowFall()
+const points = snowFall()
+
 const sphere = new THREE.Mesh(
     new THREE.SphereGeometry(1, 32, 32),
     new THREE.MeshStandardMaterial()
 )
-scene.add(sphere)
+// scene.add(sphere)
 
 // Clock
 export const clock = new THREE.Clock()
@@ -119,6 +120,7 @@ export const clock = new THREE.Clock()
 const tick = () => {
     // Get elapsed Time
     const elapsedTime = clock.getElapsedTime()
+    points.position.y = -elapsedTime 
 
     // Render again
     renderer.render(scene, camera)
