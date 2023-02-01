@@ -105,7 +105,7 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.render(scene, camera)
 renderer.physicallyCorrectLights = true
 
-const points = snowFall()
+const points = snowFall(scene)
 
 const sphere = new THREE.Mesh(
     new THREE.SphereGeometry(1, 32, 32),

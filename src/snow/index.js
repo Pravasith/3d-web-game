@@ -13,11 +13,11 @@ let geometry = null
 let material = null
 let points = null
 
-export const snowFall = () => {
+export const snowFall = (scene) => {
     if (points !== null) {
         geometry.dispose()
         material.dispose()
-        // scene.remove(points)
+        scene.remove(points)
     }
 
     geometry = new THREE.BufferGeometry()
@@ -27,27 +27,44 @@ export const snowFall = () => {
     for (let i = 0; i < params.count; i++) {
         const vertex = i * 3
         
-        positions[vertex + 0] = (Math.random() - 0.5) * 20
+        positions[vertex + 0] = (Math.random() - 0.5) * 50
         positions[vertex + 1] = i * 0.05
-        positions[vertex + 2] = (Math.random() - 0.5) * 20
-
-        // positions[vertex + 0] *= positions[vertex + 0] 
-        // positions[vertex + 1] = Math.sin(positions[vertex + 0] * 20) * 0.001 * i  
-        // positions[vertex + 2] = Math.cos(positions[vertex + 0] * 20) * 0.001 * i
-
+        positions[vertex + 2] = (Math.random() - 0.5) * 50
     }
 
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3))
 
-    material = new THREE.PointsMaterial({
-        size: params.size,
-        sizeAttenuation: true,
+    material = new THREE.ShaderMaterial({
         depthWrite: true,
         blending: THREE.AdditiveBlending,
+        vertexColors: true,
+        vertexShader: `
+            void main()
+            {
+                /**
+                 * Position
+                 */
+                vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+                vec4 viewPosition = viewMatrix * modelPosition;
+                vec4 projectionPosition = projectionMatrix * modelPosition;
+                gl_Position = projectionPosition;
+
+                /**
+                 * Size 
+                 */
+                gl_PointSize = 2.0;
+            }
+        `,
+        fragmentShader: `
+            void main()
+            {
+                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            }
+        `
     })
 
     points = new THREE.Points(geometry, material)
-    // scene.add(points)
+    scene.add(points)
 
     return points
    
