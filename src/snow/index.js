@@ -1,6 +1,5 @@
 import * as THREE from "three"
 import { GlobalGUI } from "../utils/gui"
-import { scene } from "../"
 
 // GUI
 const snowGUI = new GlobalGUI({
@@ -18,7 +17,7 @@ export const snowFall = () => {
     if (points !== null) {
         geometry.dispose()
         material.dispose()
-        scene.remove(points)
+        // scene.remove(points)
     }
 
     geometry = new THREE.BufferGeometry()
@@ -48,7 +47,7 @@ export const snowFall = () => {
     })
 
     points = new THREE.Points(geometry, material)
-    scene.add(points)
+    // scene.add(points)
 
     return points
    
