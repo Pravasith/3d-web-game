@@ -18,13 +18,13 @@ const sizes = {
 }
 
 // Models
-gltfLoader.load(
-    '/models/street-art.gltf',
-    (gltf) => {
-        console.log(gltf)
-        scene.add(gltf.scene)
-    }
-)
+// gltfLoader.load(
+//     '/models/street-art.gltf',
+//     (gltf) => {
+//         // console.log(gltf)
+//         // scene.add(gltf.scene)
+//     }
+// )
 
 // GUI
 const lightsGUI = new GlobalGUI({
@@ -88,7 +88,7 @@ const camera = new THREE.PerspectiveCamera(
     0.5,
     800
 )
-camera.position.z = 8
+camera.position.z = 1
 scene.add(camera)
 
 // Canvas
@@ -105,13 +105,48 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.render(scene, camera)
 renderer.physicallyCorrectLights = true
 
-const points = snowFall(scene)
+// const points = snowFall(scene)
 
-const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(1, 32, 32),
-    new THREE.MeshStandardMaterial()
-)
+// const sphere = new THREE.Mesh(
+//     new THREE.SphereGeometry(1, 32, 32),
+//     new THREE.MeshStandardMaterial()
+// )
 // scene.add(sphere)
+
+
+const geometry = new THREE.PlaneGeometry(1, 1, 32, 32)
+// const material = new THREE.MeshBasicMaterial()
+const material = new THREE.ShaderMaterial({
+    vertexShader: `
+        varying vec2 vUv;
+
+        void main()
+        {
+            gl_Position =  projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+            vUv = uv;
+        }
+    `,
+    fragmentShader: `
+        // uniform vec2 u_resolution;
+        varying vec2 vUv;
+
+        void main()
+        {
+            // vec2 st = gl_FragCoord.xy / u_resolution;
+            vec2 st = vUv;
+            vec3 color = vec3(st.x, 0.0, 0.5);
+
+            gl_FragColor = vec4(color, 1.0);
+        }
+    `
+})
+
+
+const plane = new THREE.Mesh(
+    geometry, material
+)
+
+scene.add(plane)
 
 // Clock
 export const clock = new THREE.Clock()
@@ -120,7 +155,7 @@ export const clock = new THREE.Clock()
 const tick = () => {
     // Get elapsed Time
     const elapsedTime = clock.getElapsedTime()
-    points.position.y = -elapsedTime 
+    // points.position.y = -elapsedTime 
 
     // Render again
     renderer.render(scene, camera)
