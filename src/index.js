@@ -3,9 +3,9 @@ import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { GlobalGUI } from "./utils/gui"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
-import { snowFall } from "./snow"
+// import { snowFall } from "./snow"
 
-const gltfLoader = new GLTFLoader()
+// const gltfLoader = new GLTFLoader()
 
 
 // Scene
@@ -27,58 +27,58 @@ const sizes = {
 // )
 
 // GUI
-const lightsGUI = new GlobalGUI({
-    width: 400,
-})
+// const lightsGUI = new GlobalGUI({
+//     width: 400,
+// })
 
-const { params } = lightsGUI
+// const { params } = lightsGUI
 
-lightsGUI.addParam("intensity", 7)
-lightsGUI.addParam("x", -3.79)
-lightsGUI.addParam("y", 5)
-lightsGUI.addParam("z", 0.65)
-lightsGUI
-    .add(params, "intensity")
-    .name("Light Intensity")
-    .min(0)
-    .max(10)
-    .step(0.001)
-    .onFinishChange(() => {
-        directionalLight.intensity = params.intensity
-    })
-lightsGUI
-    .add(params, "x")
-    .name("Light X")
-    .min(-5)
-    .max(5)
-    .step(0.01)
-    .onFinishChange(() => {
-        directionalLight.position.x = params.x
-    })
-lightsGUI
-    .add(params, "y")
-    .name("Light Y")
-    .min(-5)
-    .max(5)
-    .step(0.01)
-    .onFinishChange(() => {
-        directionalLight.position.y = params.y
-    })
-lightsGUI
-    .add(params, "z")
-    .name("Light Z")
-    .min(-5)
-    .max(5)
-    .step(0.01)
-    .onFinishChange(() => {
-        directionalLight.position.z = params.z
-    })
+// lightsGUI.addParam("intensity", 7)
+// lightsGUI.addParam("x", -3.79)
+// lightsGUI.addParam("y", 5)
+// lightsGUI.addParam("z", 0.65)
+// lightsGUI
+//     .add(params, "intensity")
+//     .name("Light Intensity")
+//     .min(0)
+//     .max(10)
+//     .step(0.001)
+//     .onFinishChange(() => {
+//         directionalLight.intensity = params.intensity
+//     })
+// lightsGUI
+//     .add(params, "x")
+//     .name("Light X")
+//     .min(-5)
+//     .max(5)
+//     .step(0.01)
+//     .onFinishChange(() => {
+//         directionalLight.position.x = params.x
+//     })
+// lightsGUI
+//     .add(params, "y")
+//     .name("Light Y")
+//     .min(-5)
+//     .max(5)
+//     .step(0.01)
+//     .onFinishChange(() => {
+//         directionalLight.position.y = params.y
+//     })
+// lightsGUI
+//     .add(params, "z")
+//     .name("Light Z")
+//     .min(-5)
+//     .max(5)
+//     .step(0.01)
+//     .onFinishChange(() => {
+//         directionalLight.position.z = params.z
+//     })
 
 // Lights
 const ambientLight = new THREE.AmbientLight('#ffffff', 0.5)
-const directionalLight = new THREE.DirectionalLight("#ffffff", params.intensity)
-directionalLight.position.set(params.x, params.y, params.z)
-scene.add(directionalLight, ambientLight)
+// const directionalLight = new THREE.DirectionalLight("#ffffff", params.intensity)
+// directionalLight.position.set(params.x, params.y, params.z)
+// scene.add(directionalLight, ambientLight)
 
 
 // Camera
@@ -122,19 +122,32 @@ const material = new THREE.ShaderMaterial({
 
         void main()
         {
+            
             gl_Position =  projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
             vUv = uv;
         }
     `,
     fragmentShader: `
-        // uniform vec2 u_resolution;
         varying vec2 vUv;
 
         void main()
         {
-            // vec2 st = gl_FragCoord.xy / u_resolution;
             vec2 st = vUv;
-            vec3 color = vec3(st.x, 0.0, 0.5);
+
+            float strength = 
+                step(.4, mod(st.x * 10., 1.))
+                *
+                step(.8, mod(st.y * 10. + .2, 1.))
+                +
+                step(.4, mod(st.y * 10., 1.))
+                *
+                step(.8, mod(st.x * 10. + .2, 1.));
+
+            vec3 color = vec3(
+                strength, 
+                strength, 
+                strength
+            );
 
             gl_FragColor = vec4(color, 1.0);
         }
