@@ -1,5 +1,7 @@
 import "./style.css"
 import * as THREE from "three"
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 
 import INIT from './initialization'
 
@@ -8,14 +10,13 @@ const {
 } = INIT
 
 
-// Models
-// gltfLoader.load(
-//     '/models/street-art.gltf',
-//     (gltf) => {
-//         // console.log(gltf)
-//         // scene.add(gltf.scene)
-//     }
-// )
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('/draco/');
+
+const gltfLoader = new GLTFLoader();
+gltfLoader.setDRACOLoader(dracoLoader);
+
+
 
 const geometry = new THREE.PlaneGeometry(1, 1, 32, 32)
 const material = new THREE.ShaderMaterial({
@@ -36,19 +37,8 @@ const material = new THREE.ShaderMaterial({
         {
             vec2 st = vUv;
 
-            float strength = 
-                step(.4, mod(st.x * 10., 1.))
-                *
-                step(.8, mod(st.y * 10. + .2, 1.))
-                +
-                step(.4, mod(st.y * 10., 1.))
-                *
-                step(.8, mod(st.x * 10. + .2, 1.));
-
             vec3 color = vec3(
-                strength, 
-                strength, 
-                strength
+                st.x, st.y, 0.0 
             );
 
             gl_FragColor = vec4(color, 1.0);
@@ -60,7 +50,24 @@ const plane = new THREE.Mesh(
     geometry, material
 )
 
-scene.add(plane)
+// scene.add(plane)
+
+let model
+
+// Models
+gltfLoader.load(
+    '/models/troopie.gltf',
+    (gltf) => {
+        model = gltf
+        scene.add(gltf.scene)
+
+        model.scene.traverse(o => {
+            if (o.isMesh) {
+                o.material = material
+            }
+        })
+    }
+)
 
 let rafID
 
