@@ -2,13 +2,14 @@
 import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
+
 // Scene
 const scene = new THREE.Scene()
 
 // Sizes
 const sizes = {
-    width: 800,
-    height: 600,
+    width: window.innerWidth,
+    height: window.innerHeight,
 }
 
 // Camera

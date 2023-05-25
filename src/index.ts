@@ -2,18 +2,18 @@ import "./style.css"
 import * as THREE from "three"
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
-import World from "./world/world";
+
+import INIT from './initialization'
+
+const {
+    scene, camera, renderer, clock,
+} = INIT
 
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath('/draco/');
 
 const gltfLoader = new GLTFLoader();
 gltfLoader.setDRACOLoader(dracoLoader);
-
-const canvas = document.getElementsByClassName('webgl')[0]
-
-const world = new World(canvas)
-
 
 // const material = new THREE.ShaderMaterial({
 //     vertexShader: `
@@ -43,23 +43,24 @@ const world = new World(canvas)
 // })
 
 
-// let model
+let model
 const material = new THREE.MeshStandardMaterial()
 material.roughness = 0.8
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
-world.add(ambientLight)
+scene.add(ambientLight)
 
 const directionalLight = new THREE.DirectionalLight('#29abef', 2)
-world.add(directionalLight)
+scene.add(directionalLight)
 
 // Models
 gltfLoader.load(
     '/models/troopie.gltf',
     (gltf) => {
-        world.add(gltf.scene)
+        model = gltf
+        scene.add(gltf.scene)
 
-        gltf.scene.traverse(o => {
+        model.scene.traverse(o => {
             if (o.isMesh) {
                 o.material = material
             }
@@ -67,4 +68,18 @@ gltfLoader.load(
     }
 )
 
-world.startRaf()
+let rafID: number
+
+// Animations
+const tick = () => {
+    // Get elapsed Time
+    const elapsedTime = clock.getElapsedTime()
+
+    renderer.render(scene, camera)
+    rafID = requestAnimationFrame(tick)
+}
+
+tick()
+
+const stopAnimating = false
+stopAnimating && cancelAnimationFrame(rafID)
