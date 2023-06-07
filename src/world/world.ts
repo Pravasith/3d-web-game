@@ -2,15 +2,16 @@ import * as THREE from 'three'
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
 class World {
-    public renderer: THREE.WebGLRenderer
-    public camera: THREE.PerspectiveCamera
-    public scene: THREE.Scene
-    public clock: THREE.Clock
-
     private rafID: number
     private elapsedTime: number
 
-    constructor(canvas: HTMLCanvasElement) {
+    static instance: World
+    static renderer: THREE.WebGLRenderer
+    static camera: THREE.PerspectiveCamera
+    static scene: THREE.Scene
+    static clock: THREE.Clock
+
+    private constructor(canvas: HTMLCanvasElement) {
         // Canvas
         if (!canvas) throw new Error("You must pass a canvas in.")
 
@@ -19,54 +20,65 @@ class World {
             height: window.innerHeight,
         }
 
-        this.camera = new THREE.PerspectiveCamera(
+        World.camera = new THREE.PerspectiveCamera(
             75,
             sizes.width / sizes.height,
             0.5,
             800
         )
 
-        this.camera.position.z = 1
+        World.camera.position.z = 1
+        World.scene = new THREE.Scene()
 
-        this.scene = new THREE.Scene()
+        World.renderer = new THREE.WebGLRenderer({ canvas, })
+        World.renderer.setSize(sizes.width, sizes.height)
+        World.renderer.render(World.scene, World.camera)
+        World.renderer.physicallyCorrectLights = true
 
-        this.renderer = new THREE.WebGLRenderer({
-            canvas,
-        })
-        this.renderer.setSize(sizes.width, sizes.height)
-        this.renderer.render(this.scene, this.camera)
-        this.renderer.physicallyCorrectLights = true
-
-        this.clock = new THREE.Clock()
+        World.clock = new THREE.Clock()
 
         // Controls
-        const controls = new OrbitControls(this.camera, canvas)
-        console.log(controls)
+        // TODO: Move this
+        const controls = new OrbitControls(World.camera, canvas)
     }
 
-    ticker() {
-        this.elapsedTime = this.clock.getElapsedTime()
-        this.renderer.render(this.scene, this.camera)
-        this.rafID = requestAnimationFrame(() => this.ticker())
+    static init(canvas: HTMLCanvasElement) {
+        if (!World.instance) {
+            World.instance = new World(canvas)
+        }
+
+        return World.instance
     }
 
+    static ticker(world: World) {
+        this.instance.elapsedTime = World.clock.getElapsedTime()
+        World.renderer.render(World.scene, World.camera)
 
-    startRaf() {
-        this.ticker()
+        this.instance.rafID = requestAnimationFrame(() => World.ticker(World.instance))
+        this.instance.updateWorld()
     }
 
-    endRaf() {
-        if (this.rafID)
-            cancelAnimationFrame(this.rafID)
+    updateWorld() {
+        // Register all updatables 
+        // And run all the update() methods 
+        // of those updatables
+    }
+
+    static startRaf() {
+        World.ticker(this.instance)
+    }
+
+    static endRaf() {
+        if (this.instance.rafID)
+            cancelAnimationFrame(this.instance.rafID)
     }
 
     add(obj: THREE.Object3D | THREE.Mesh) {
         if (!obj)
             throw new Error("you must pass the object to add to the Scene")
 
-        this.scene.add(obj)
+        World.scene.add(obj)
     }
-
 }
 
 export default World

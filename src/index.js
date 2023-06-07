@@ -12,8 +12,7 @@ gltfLoader.setDRACOLoader(dracoLoader);
 
 const canvas = document.getElementsByClassName('webgl')[0]
 
-const world = new World(canvas)
-
+const world = World.init(canvas)
 
 // const material = new THREE.ShaderMaterial({
 //     vertexShader: `
@@ -67,4 +66,4 @@ gltfLoader.load(
     }
 )
 
-world.startRaf()
+World.startRaf()
