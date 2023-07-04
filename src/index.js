@@ -1,18 +1,4 @@
 import "./style.css"
-import * as THREE from "three"
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
-import World from "./world/world";
-
-const dracoLoader = new DRACOLoader();
-dracoLoader.setDecoderPath('/draco/');
-
-const gltfLoader = new GLTFLoader();
-gltfLoader.setDRACOLoader(dracoLoader);
-
-const canvas = document.getElementsByClassName('webgl')[0]
-
-const world = World.init(canvas)
 
 // const material = new THREE.ShaderMaterial({
 //     vertexShader: `
@@ -42,28 +28,3 @@ const world = World.init(canvas)
 // })
 
 
-// let model
-const material = new THREE.MeshStandardMaterial()
-material.roughness = 0.8
-
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
-world.add(ambientLight)
-
-const directionalLight = new THREE.DirectionalLight('#29abef', 2)
-world.add(directionalLight)
-
-// Models
-gltfLoader.load(
-    '/models/troopie.gltf',
-    (gltf) => {
-        world.add(gltf.scene)
-
-        gltf.scene.traverse(o => {
-            if (o.isMesh) {
-                o.material = material
-            }
-        })
-    }
-)
-
-World.startRaf()
