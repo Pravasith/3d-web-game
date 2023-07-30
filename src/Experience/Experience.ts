@@ -1,16 +1,21 @@
 import Sizes from "../Utils/Sizes"
 
 export default class Experience {
-    static instance: Experience
-    sizes: Sizes
+  static instance: Experience
+  sizes: Sizes
 
-    private constructor() {
-        if (Experience.instance)
-            return Experience.instance
-        else {
-            // init experience
-        }
+  private constructor() {
+    this.sizes = new Sizes()
+  }
 
-        this.sizes = new Sizes()
+  static getInstance(): Experience {
+    if (!Experience.instance) {
+      Experience.instance = new Experience()
     }
+
+    return Experience.instance
+  }
+
 }
+
+const experience = Experience.getInstance()
