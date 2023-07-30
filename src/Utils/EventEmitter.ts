@@ -28,12 +28,13 @@ export class EventEmitter {
         const names = this.resolveNames(_names)
 
         // Each name
-        names.forEach((_name) => {
+        names.forEach(_name => {
             // Resolve name
             const name = this.resolveName(_name)
 
             // Create namespace if not exist
-            if (!(this.callbacks[name.namespace] instanceof Object)) this.callbacks[name.namespace] = {}
+            if (!(this.callbacks[name.namespace] instanceof Object))
+                this.callbacks[name.namespace] = {}
 
             // Create callback if not exist
             if (!(this.callbacks[name.namespace][name.value] instanceof Array))
@@ -57,7 +58,7 @@ export class EventEmitter {
         const names = this.resolveNames(_names)
 
         // Each name
-        names.forEach((_name) => {
+        names.forEach(_name => {
             // Resolve name
             const name = this.resolveName(_name)
 
@@ -79,7 +80,8 @@ export class EventEmitter {
                             delete this.callbacks[namespace][name.value]
 
                             // Remove namespace if empty
-                            if (Object.keys(this.callbacks[namespace]).length === 0) delete this.callbacks[namespace]
+                            if (Object.keys(this.callbacks[namespace]).length === 0)
+                                delete this.callbacks[namespace]
                         }
                     }
                 }
@@ -92,7 +94,8 @@ export class EventEmitter {
                     delete this.callbacks[name.namespace][name.value]
 
                     // Remove namespace if empty
-                    if (Object.keys(this.callbacks[name.namespace]).length === 0) delete this.callbacks[name.namespace]
+                    if (Object.keys(this.callbacks[name.namespace]).length === 0)
+                        delete this.callbacks[name.namespace]
                 }
             }
         })

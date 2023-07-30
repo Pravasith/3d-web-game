@@ -1,21 +1,28 @@
-import Sizes from "../Utils/Sizes"
+import Sizes from '../Utils/Sizes'
 
-export default class Experience {
-  static instance: Experience
-  sizes: Sizes
+export class Experience {
+    static instance: Experience
+    sizes: Sizes
+    canvas: HTMLCanvasElement
 
-  private constructor() {
-    this.sizes = new Sizes()
-  }
+    private constructor(canvas: HTMLCanvasElement) {
+        // Options
+        this.canvas = canvas
 
-  static getInstance(): Experience {
-    if (!Experience.instance) {
-      Experience.instance = new Experience()
+        // Setup
+        this.sizes = new Sizes()
+        this.sizes.on('resize', () => {
+            console.log('XX')
+        })
     }
 
-    return Experience.instance
-  }
+    static getInstance(): Experience {
+        const canvas = document.querySelector<HTMLCanvasElement>('canvas#webgl')
 
+        if (!Experience.instance && canvas) {
+            Experience.instance = new Experience(canvas)
+        }
+
+        return Experience.instance
+    }
 }
-
-const experience = Experience.getInstance()

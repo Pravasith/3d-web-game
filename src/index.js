@@ -1,4 +1,18 @@
+import { Experience } from "./Experience/Experience"
 import "./style.css"
+
+const experience = Experience.getInstance()
+
+
+
+
+
+
+
+
+
+
+
 
 // const material = new THREE.ShaderMaterial({
 //     vertexShader: `
