@@ -1,18 +1,38 @@
-import Sizes from '../Utils/Sizes'
+import Sizes from './Utils/Sizes'
+import Camera from './Camera'
+import Renderer from './Renderer'
+import Time from './Time'
+import * as THREE from 'three'
+import World from './World/World'
 
 export class Experience {
     static instance: Experience
-    sizes: Sizes
-    canvas: HTMLCanvasElement
+    static sizes: Sizes
+    static camera: Camera
+    static canvas: HTMLCanvasElement
+    static time: Time
+    static scene: THREE.Scene
+    static renderer: Renderer
+    static world: World
 
     private constructor(canvas: HTMLCanvasElement) {
         // Options
-        this.canvas = canvas
+        Experience.canvas = canvas
 
         // Setup
-        this.sizes = new Sizes()
-        this.sizes.on('resize', () => {
-            console.log('XX')
+        Experience.sizes = new Sizes()
+        Experience.time = new Time()
+        Experience.scene = new THREE.Scene()
+        Experience.camera = new Camera()
+        Experience.renderer = new Renderer()
+        Experience.world = new World()
+
+        Experience.sizes.on('resize', () => {
+            this.resize()
+        })
+
+        Experience.time.on('tick', () => {
+            this.update()
         })
     }
 
@@ -24,5 +44,15 @@ export class Experience {
         }
 
         return Experience.instance
+    }
+
+    resize() {
+        Experience.camera.resize()
+        Experience.renderer.resize()
+    }
+
+    update() {
+        Experience.camera.update()
+        Experience.renderer.update()
     }
 }
