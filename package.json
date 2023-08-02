@@ -8,6 +8,7 @@
         "build": "vite build"
     },
     "dependencies": {
+        "@types/three": "^0.152.0",
         "lil-gui": "^0.17.0",
         "three": "0.148.0"
     },
