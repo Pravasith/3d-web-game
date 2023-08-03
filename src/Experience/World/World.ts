@@ -1,21 +1,21 @@
 import { Experience } from '../Experience'
 import * as THREE from 'three'
 import Environment from './Environment'
+import Resources from '../Utils/Resources'
 
 export default class World {
     scene: THREE.Scene
     environment: Environment
+    resources: Resources
 
     constructor() {
         this.scene = Experience.scene
+        this.resources = Experience.resources
 
-        const testMesh = new THREE.Mesh(
-            new THREE.BoxGeometry(1, 1, 1),
-            new THREE.MeshStandardMaterial({})
-        )
-
-        this.scene.add(testMesh)
-
-        this.environment = new Environment()
+        // Wait for resources
+        this.resources.on('ready', () => {
+            // Setup
+            this.environment = new Environment()
+        })
     }
 }
