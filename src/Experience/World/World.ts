@@ -2,6 +2,7 @@ import { Experience } from '../Experience'
 import * as THREE from 'three'
 import Environment from './Environment'
 import Resources from '../Utils/Resources'
+import Plini from '../Characters/Plini'
 
 export default class World {
     scene: THREE.Scene
@@ -16,6 +17,9 @@ export default class World {
         this.resources.on('ready', () => {
             // Setup
             this.environment = new Environment()
+
+            const plini = new Plini()
+            plini.setModel()
         })
     }
 }

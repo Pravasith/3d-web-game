@@ -28,8 +28,8 @@ export class Experience {
         Experience.scene = new THREE.Scene()
         Experience.camera = new Camera()
         Experience.renderer = new Renderer()
-        Experience.world = new World()
         Experience.resources = new Resources(sources)
+        Experience.world = new World()
 
         Experience.sizes.on('resize', () => {
             this.resize()
