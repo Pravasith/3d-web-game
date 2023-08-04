@@ -1,20 +1,36 @@
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader'
 import { Experience } from '../Experience'
+import Controls from './Controls'
 
 export default class Character {
-    model: GLTF
-    scene: THREE.Scene
+    protected model: GLTF
 
-    constructor(model: GLTF) {
-        this.model = model
+    private scene: THREE.Scene
+    private controls: Controls
+
+    constructor() {
         this.scene = Experience.scene
-        this.setModel()
+        this.setControls()
     }
 
-    setModel() {
-        if (!this.model) return
-        else {
+    setModel(model: GLTF) {
+        if (!model) {
+            throw new Error('Oops! Forgot to pass the model?')
+        } else {
+            this.model = model
             this.scene.add(this.model.scene)
         }
+    }
+
+    setControls() {
+        this.controls = new Controls()
+
+        this.controls.on('moveForward', () => {
+            this.model.scene.position.x += 0.1
+        })
+
+        this.controls.on('moveBackward', () => {
+            this.model.scene.position.x -= 0.1
+        })
     }
 }

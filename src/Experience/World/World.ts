@@ -19,7 +19,6 @@ export default class World {
             this.environment = new Environment()
 
             const plini = new Plini()
-            plini.setModel()
         })
     }
 }
