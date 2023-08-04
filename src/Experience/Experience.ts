@@ -4,6 +4,8 @@ import Renderer from './Renderer'
 import Time from './Time'
 import * as THREE from 'three'
 import World from './World/World'
+import Resources from './Utils/Resources'
+import sources from './sources'
 
 export class Experience {
     static instance: Experience
@@ -14,6 +16,7 @@ export class Experience {
     static scene: THREE.Scene
     static renderer: Renderer
     static world: World
+    static resources: Resources
 
     private constructor(canvas: HTMLCanvasElement) {
         // Options
@@ -25,6 +28,7 @@ export class Experience {
         Experience.scene = new THREE.Scene()
         Experience.camera = new Camera()
         Experience.renderer = new Renderer()
+        Experience.resources = new Resources(sources)
         Experience.world = new World()
 
         Experience.sizes.on('resize', () => {
