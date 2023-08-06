@@ -5,9 +5,10 @@ import Resources from '../Utils/Resources'
 import Plini from '../Characters/Plini'
 
 export default class World {
-    scene: THREE.Scene
-    environment: Environment
-    resources: Resources
+    private scene: THREE.Scene
+    private environment: Environment
+    private resources: Resources
+    private plini: Plini
 
     constructor() {
         this.scene = Experience.scene
@@ -17,8 +18,11 @@ export default class World {
         this.resources.on('ready', () => {
             // Setup
             this.environment = new Environment()
-
-            const plini = new Plini()
+            this.plini = new Plini()
         })
+    }
+
+    update() {
+        if (this.plini) this.plini.update()
     }
 }

@@ -58,5 +58,6 @@ export class Experience {
     update() {
         Experience.camera.update()
         Experience.renderer.update()
+        Experience.world.update()
     }
 }

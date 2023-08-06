@@ -66,6 +66,7 @@ export default class Character {
             this.A = this.A.add(
                 new THREE.Vector2(Math.max(-step_acceleration, -max_acceleration), 0)
             )
+            this.model.scene.rotation.y = 0
             // console.log(this.V.x, this.A.y)
         })
 
@@ -77,7 +78,8 @@ export default class Character {
         // Move backward
         this.controls.on('s_pressed', () => {
             this.A = this.A.add(new THREE.Vector2(Math.max(step_acceleration, max_acceleration), 0))
-            console.log(this.V.x, this.A.y)
+            this.model.scene.rotation.y = 3.14
+            // console.log(this.V.x, this.A.y)
         })
 
         this.controls.on('s_released', () => {

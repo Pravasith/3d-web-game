@@ -9,5 +9,6 @@ export default class Plini extends Character {
         super()
 
         this.setModel(model)
+        this.setControls()
     }
 }
