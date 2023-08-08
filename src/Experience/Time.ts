@@ -1,16 +1,16 @@
 import { EventEmitter } from './Utils/EventEmitter'
 
 export default class Time extends EventEmitter {
-    start: number
-    currrent: number
-    elapsed: number
-    delta: number
+    public start: number
+    public current: number
+    public elapsed: number
+    public delta: number
 
     constructor() {
         super()
 
         this.start = Date.now()
-        this.currrent = this.start
+        this.current = this.start
         this.elapsed = 0
         this.delta = 16
 
@@ -22,9 +22,11 @@ export default class Time extends EventEmitter {
     tick() {
         const currentTime = Date.now()
 
-        this.delta = currentTime - this.currrent
-        this.currrent = currentTime
-        this.elapsed = this.currrent - this.start
+        this.delta = currentTime - this.current
+        this.current = currentTime
+
+        // in Seconds
+        this.elapsed = (this.current - this.start) / 1000
 
         this.trigger('tick')
 

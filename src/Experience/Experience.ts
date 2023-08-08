@@ -5,7 +5,7 @@ import Time from './Time'
 import * as THREE from 'three'
 import World from './World/World'
 import Resources from './Utils/Resources'
-import sources from './sources'
+import sources from './constants/sources'
 
 export class Experience {
     static instance: Experience
@@ -58,5 +58,6 @@ export class Experience {
     update() {
         Experience.camera.update()
         Experience.renderer.update()
+        Experience.world.update()
     }
 }

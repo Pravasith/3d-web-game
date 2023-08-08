@@ -1,4 +1,4 @@
-import { ISource, LOAD_ITEMS } from '../sources'
+import { ISource, LOAD_ITEMS } from '../constants/sources'
 import { EventEmitter } from './EventEmitter'
 import * as THREE from 'three'
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
