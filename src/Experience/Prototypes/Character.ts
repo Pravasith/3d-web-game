@@ -17,6 +17,7 @@ export default class Character {
     model: GLTF
 
     private scene: THREE.Scene
+    private camera: THREE.PerspectiveCamera
     private controls: Controls
     private time: Time
 
@@ -29,6 +30,7 @@ export default class Character {
     constructor() {
         this.scene = Experience.scene
         this.time = Experience.time
+        this.camera = Experience.camera.instance
     }
 
     setModel(model: GLTF) {
@@ -69,6 +71,7 @@ export default class Character {
 
     setControls() {
         this.controls = new Controls()
+        // this.model.scene.rotation.y = this.camera.rotation.y
 
         // Move forward
         this.controls.on('w_pressed', () => {
