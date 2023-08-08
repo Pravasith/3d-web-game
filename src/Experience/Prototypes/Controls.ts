@@ -1,9 +1,20 @@
+import { Object3D } from 'three'
 import { EventEmitter } from '../Utils/EventEmitter'
 import { GLOBAL_KEY_CODES } from '../constants/keybindings'
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls'
+import { Experience } from '../Experience'
 
 export default class Controls extends EventEmitter {
+    camera: THREE.PerspectiveCamera
+
+    private controls: PointerLockControls
+    private anchor: Object3D
+    private webglContainer: HTMLElement | null
+
     constructor() {
         super()
+
+        this.camera = Experience.camera.instance
 
         window.addEventListener('keydown', (e: KeyboardEvent) => {
             this.onKeyDown(e)
@@ -12,6 +23,24 @@ export default class Controls extends EventEmitter {
         window.addEventListener('keyup', (e: KeyboardEvent) => {
             this.onKeyUp(e)
         })
+
+        this.anchor = new Object3D()
+        this.anchor.position.set(0, 4, 4)
+
+        this.setContols()
+    }
+
+    setContols() {
+        this.webglContainer = document.getElementById('webgl-container')
+
+        if (this.webglContainer) {
+            // this.anchor.add(this.camera)
+            this.controls = new PointerLockControls(this.camera, this.webglContainer)
+
+            this.webglContainer.addEventListener('click', () => {
+                ;(this.controls as PointerLockControls).lock()
+            })
+        }
     }
 
     onKeyDown(e: KeyboardEvent) {

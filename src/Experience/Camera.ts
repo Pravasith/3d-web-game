@@ -4,11 +4,12 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 export default class Camera {
-    sizes: Sizes
-    canvas: HTMLCanvasElement
-    scene: THREE.Scene
     instance: THREE.PerspectiveCamera
-    controls: OrbitControls
+
+    private sizes: Sizes
+    private canvas: HTMLCanvasElement
+    private scene: THREE.Scene
+    private controls: OrbitControls
 
     constructor() {
         this.scene = Experience.scene
@@ -17,7 +18,9 @@ export default class Camera {
 
         // init
         this.setInstance()
-        this.setOrbitControls()
+
+        // this.setOrbitControls()
+        // this.setPointerLockControls()
     }
 
     setInstance() {
@@ -28,8 +31,11 @@ export default class Camera {
             100
         )
 
-        this.instance.position.set(6, 4, 8)
+        this.instance.position.set(0, 0, 0)
         this.scene.add(this.instance)
+
+        this.instance.position.set(4, 4, 0)
+        this.instance.lookAt(0, 0, 0)
     }
 
     setOrbitControls() {
@@ -43,6 +49,8 @@ export default class Camera {
     }
 
     update() {
-        this.controls.update()
+        if (typeof this.controls === typeof OrbitControls) {
+            ;(this.controls as OrbitControls).update()
+        }
     }
 }
