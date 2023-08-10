@@ -55,6 +55,7 @@ export default class Character {
 
         // Update logic
         // this.V = this.V.add(this.A)
+
         this.V = this.V.add(this.A)
 
         this.V.x = Math.min(this.V.x, max_velocity_x / 4)
@@ -67,11 +68,18 @@ export default class Character {
 
         this.model.scene.position.x = this.S2.x
         this.model.scene.position.z = this.S2.y
+
+        // this.camera.position.y = this.model.scene.position.y + 4
+        // this.camera.position.x = this.model.scene.position.x + 4
+    }
+
+    onMouseMove(e: MouseEvent) {
+        this.model.scene.rotation.y += e.movementX * 0.01
     }
 
     setControls() {
         this.controls = new Controls()
-        // this.model.scene.rotation.y = this.camera.rotation.y
+        this.controls.setContols((e: MouseEvent) => this.onMouseMove(e))
 
         // Move forward
         this.controls.on('w_pressed', () => {

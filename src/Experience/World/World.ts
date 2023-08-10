@@ -4,7 +4,7 @@ import Environment from './Environment'
 import Resources from '../Utils/Resources'
 import Plini from '../Characters/Plini'
 import Helpers from '../Helpers'
-import { randFloat, randInt } from 'three/src/math/MathUtils'
+import { randFloat } from 'three/src/math/MathUtils'
 
 export default class World {
     private camera: THREE.PerspectiveCamera
@@ -45,12 +45,18 @@ export default class World {
     }
 
     deleteThis() {
-        for (let i = 0; i < 500; i++) {
-            const geometry = new THREE.SphereGeometry(0.05, 0.05, 0.05)
-            const material = new THREE.MeshStandardMaterial({ color: 0xffff00 })
+        for (let i = 0; i < 2500; i++) {
+            const randX = randFloat(-50, 50)
+            const geometry = new THREE.SphereGeometry(0.02, 0.02, 0.02)
+            const material = new THREE.MeshPhongMaterial({
+                color: `rgb(${Math.floor((Math.abs(randX) * 255) / 50)}, 
+                            ${Math.floor((Math.abs(randX) * 255) / 50)},
+                            255
+                           )`,
+            })
             const sphere = new THREE.Mesh(geometry, material)
 
-            sphere.position.set(randFloat(-8, 8), randFloat(-8, 8), randFloat(-8, 8))
+            sphere.position.set(randX, randFloat(-8, 8), randFloat(-8, 8))
 
             this.scene.add(sphere)
         }
