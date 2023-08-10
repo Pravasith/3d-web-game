@@ -1,4 +1,4 @@
-import { Object3D, Scene } from 'three'
+import { Object3D, PerspectiveCamera, Scene } from 'three'
 import { EventEmitter } from '../Utils/EventEmitter'
 import { GLOBAL_KEY_CODES } from '../constants/keybindings'
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls'
@@ -9,14 +9,16 @@ export default class Controls extends EventEmitter {
 
     private controls: PointerLockControls
     private anchor: Object3D
-    private webglContainer: HTMLElement | null
     private scene: Scene
+    private canvas: HTMLCanvasElement
+    private isPointerLockActive: boolean = false
 
     constructor() {
         super()
 
         this.camera = Experience.camera.instance
         this.scene = Experience.scene
+        this.canvas = Experience.canvas
 
         window.addEventListener('keydown', (e: KeyboardEvent) => {
             this.onKeyDown(e)
@@ -27,26 +29,33 @@ export default class Controls extends EventEmitter {
         })
 
         this.anchor = new Object3D()
-        this.anchor.position.set(0, 4, 4)
-
-        this.setContols()
+        this.anchor.position.set(4, 4, 0)
     }
 
-    setContols() {
-        this.webglContainer = document.getElementById('webgl-container')
+    public setContols(onMouseMove: (e: MouseEvent) => void) {
+        this.canvas.addEventListener('click', async () => {
+            this.canvas.requestPointerLock()
+        })
 
-        if (this.webglContainer) {
-            // this.anchor.add(this.camera)
-            this.controls = new PointerLockControls(this.camera, this.webglContainer)
-            this.scene.add(this.controls.getObject())
+        document.addEventListener(
+            'pointerlockchange',
+            () => {
+                this.isPointerLockActive = !this.isPointerLockActive
+                this.trigger(this.isPointerLockActive ? 'lockmouse' : 'unlockmouse')
+            },
+            false
+        )
 
-            this.webglContainer.addEventListener('click', () => {
-                ;(this.controls as PointerLockControls).lock()
-            })
-        }
+        this.on('lockmouse', () => {
+            this.canvas.addEventListener('mousemove', onMouseMove)
+        })
+
+        this.on('unlockmouse', () => {
+            this.canvas.removeEventListener('mousemove', onMouseMove)
+        })
     }
 
-    onKeyDown(e: KeyboardEvent) {
+    private onKeyDown(e: KeyboardEvent) {
         switch (e.code) {
             case GLOBAL_KEY_CODES.W:
                 this.trigger('w_pressed')
@@ -70,7 +79,7 @@ export default class Controls extends EventEmitter {
         }
     }
 
-    onKeyUp(e: KeyboardEvent) {
+    private onKeyUp(e: KeyboardEvent) {
         switch (e.code) {
             case GLOBAL_KEY_CODES.W:
                 this.trigger('w_released')

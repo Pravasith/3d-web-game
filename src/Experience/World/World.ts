@@ -4,7 +4,7 @@ import Environment from './Environment'
 import Resources from '../Utils/Resources'
 import Plini from '../Characters/Plini'
 import Helpers from '../Helpers'
-import { randFloat, randInt } from 'three/src/math/MathUtils'
+import { randFloat } from 'three/src/math/MathUtils'
 
 export default class World {
     private camera: THREE.PerspectiveCamera
