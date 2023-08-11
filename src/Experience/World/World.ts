@@ -45,13 +45,13 @@ export default class World {
     }
 
     deleteThis() {
-        for (let i = 0; i < 5000; i++) {
+        for (let i = 0; i < 1500; i++) {
             const randX = randFloat(-50, 50)
             const randY = randFloat(-50, 50)
             const randZ = randFloat(-50, 50)
 
             const geometry = new THREE.SphereGeometry(0.02, 0.02, 0.02)
-            const material = new THREE.MeshPhongMaterial({
+            const material = new THREE.MeshBasicMaterial({
                 color: `rgb(
                   ${Math.floor((Math.abs(randX) * 255) / 50)}, 
                   ${Math.floor((Math.abs(randY) * 255) / 50)},
