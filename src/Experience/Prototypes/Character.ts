@@ -29,18 +29,27 @@ export default class Character {
     private A = new THREE.Vector2()
 
     private anchor: THREE.Object3D
+<<<<<<< HEAD
     private helpers: Helpers
     private cameraHelpers: Helpers
+=======
+    private group: THREE.Group
+>>>>>>> main
 
     constructor() {
         this.scene = Experience.scene
         this.time = Experience.time
         this.camera = Experience.camera.instance
+<<<<<<< HEAD
 
         this.anchor = new THREE.Object3D()
 
         this.helpers = new Helpers()
         this.cameraHelpers = new Helpers()
+=======
+        this.anchor = new THREE.Object3D()
+        this.group = new THREE.Group()
+>>>>>>> main
 
         this.scene.add(this.anchor)
     }
@@ -54,6 +63,10 @@ export default class Character {
 
             this.model.scene.position.x = this.S1.x
             this.anchor.add(this.camera)
+<<<<<<< HEAD
+=======
+            // this.model.scene.parent = this.anchor
+>>>>>>> main
         }
     }
 
@@ -81,7 +94,7 @@ export default class Character {
 
         this.V = this.V.add(this.A)
 
-        this.V.x = Math.min(this.V.x, max_velocity_x / 4)
+        this.V.x = Math.min(this.V.x, max_velocity_x / 2)
         this.V.x = Math.max(this.V.x, -max_velocity_x)
 
         this.V.y = Math.min(this.V.y, max_velocity_z)
@@ -93,10 +106,17 @@ export default class Character {
         this.model.scene.position.z = this.S2.y
 
         this.anchor.position.x = this.model.scene.position.x
+<<<<<<< HEAD
+=======
+
+        // this.camera.position.y = this.model.scene.position.y + 4
+        // this.camera.position.x = this.model.scene.position.x + 4
+>>>>>>> main
     }
 
     onMouseMove(e: MouseEvent) {
-        this.model.scene.rotation.y += e.movementX * 0.01
+        this.anchor.rotation.y -= e.movementX * 0.001
+        this.anchor.rotation.z += e.movementY * 0.001
     }
 
     setControls() {
@@ -126,5 +146,32 @@ export default class Character {
             this.A.x = 0
             this.A.y = 0
         })
+<<<<<<< HEAD
+=======
+
+        // // Go left
+        // this.controls.on('a_pressed', () => {
+        //     this.A = this.A.add(
+        //         new THREE.Vector2(0, Math.max(step_acceleration_z, max_acceleration_z))
+        //     )
+        // })
+        //
+        // this.controls.on('a_released', () => {
+        //     this.A.x = 0
+        //     this.A.y = 0
+        // })
+        //
+        // // Go right
+        // this.controls.on('d_pressed', () => {
+        //     this.A = this.A.add(
+        //         new THREE.Vector2(0, Math.max(-step_acceleration_z, -max_acceleration_z))
+        //     )
+        // })
+        //
+        // this.controls.on('d_released', () => {
+        //     this.A.x = 0
+        //     this.A.y = 0
+        // })
+>>>>>>> main
     }
 }

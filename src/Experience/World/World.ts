@@ -25,7 +25,7 @@ export default class World {
             this._environment = new Environment()
             this.plini = new Plini()
 
-            this.camera.parent = this.plini.model.scene
+            // this.camera.parent = this.plini.model.scene
         })
 
         this.helpers = new Helpers()
@@ -45,18 +45,18 @@ export default class World {
     }
 
     deleteThis() {
-<<<<<<< Updated upstream
-        for (let i = 0; i < 2500; i++) {
-=======
-        for (let i = 0; i < 500; i++) {
->>>>>>> Stashed changes
+        for (let i = 0; i < 1500; i++) {
             const randX = randFloat(-50, 50)
+            const randY = randFloat(-50, 50)
+            const randZ = randFloat(-50, 50)
+
             const geometry = new THREE.SphereGeometry(0.02, 0.02, 0.02)
-            const material = new THREE.MeshPhongMaterial({
-                color: `rgb(${Math.floor((Math.abs(randX) * 255) / 50)}, 
-                            ${Math.floor((Math.abs(randX) * 255) / 50)},
-                            255
-                           )`,
+            const material = new THREE.MeshBasicMaterial({
+                color: `rgb(
+                  ${Math.floor((Math.abs(randX) * 255) / 50)}, 
+                  ${Math.floor((Math.abs(randY) * 255) / 50)},
+                  ${Math.floor((Math.abs(randZ) * 255) / 50)}
+                )`,
             })
             const sphere = new THREE.Mesh(geometry, material)
 

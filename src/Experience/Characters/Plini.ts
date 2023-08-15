@@ -11,12 +11,11 @@ export default class Plini extends Character {
 
         this.setModel(model)
         this.setControls()
-        const material = new MeshPhongMaterial({ color: '#fcba03' })
+        const material = new MeshPhongMaterial({ color: '#ffffff' })
 
-        model.scene.traverse((o: Mesh) => {
-            if (o.isMesh) {
-                // console.log(o)
-                o.material = material
+        model.scene.traverse(o => {
+            if ((o as Mesh).isMesh) {
+                ;(o as Mesh).material = material
             }
         })
     }

@@ -19,7 +19,7 @@ export default class Camera {
         // init
         this.setInstance()
 
-        // this.setOrbitControls()
+        this.setOrbitControls()
         // this.setPointerLockControls()
     }
 
@@ -34,7 +34,7 @@ export default class Camera {
         this.instance.position.set(0, 0, 0)
         this.scene.add(this.instance)
 
-        this.instance.position.set(4, 4, 0)
+        this.instance.position.set(6, 6, 0)
         this.instance.lookAt(0, 0, 0)
     }
 
