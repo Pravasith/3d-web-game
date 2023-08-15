@@ -45,7 +45,11 @@ export default class World {
     }
 
     deleteThis() {
+<<<<<<< Updated upstream
         for (let i = 0; i < 2500; i++) {
+=======
+        for (let i = 0; i < 500; i++) {
+>>>>>>> Stashed changes
             const randX = randFloat(-50, 50)
             const geometry = new THREE.SphereGeometry(0.02, 0.02, 0.02)
             const material = new THREE.MeshPhongMaterial({

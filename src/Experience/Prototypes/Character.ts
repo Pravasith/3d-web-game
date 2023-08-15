@@ -3,9 +3,10 @@ import { Experience } from '../Experience'
 import Controls from './Controls'
 import Time from '../Time'
 import * as THREE from 'three'
+import Helpers from '../Helpers'
 
-const max_velocity_x = 0.05
-const max_velocity_z = 0.05 / 4
+const max_velocity_x = 0.08
+const max_velocity_z = 0.08 / 4
 
 const max_acceleration_x = 0.01
 const step_acceleration_x = 0.0005
@@ -27,10 +28,21 @@ export default class Character {
     private V = new THREE.Vector2()
     private A = new THREE.Vector2()
 
+    private anchor: THREE.Object3D
+    private helpers: Helpers
+    private cameraHelpers: Helpers
+
     constructor() {
         this.scene = Experience.scene
         this.time = Experience.time
         this.camera = Experience.camera.instance
+
+        this.anchor = new THREE.Object3D()
+
+        this.helpers = new Helpers()
+        this.cameraHelpers = new Helpers()
+
+        this.scene.add(this.anchor)
     }
 
     setModel(model: GLTF) {
@@ -41,20 +53,31 @@ export default class Character {
             this.scene.add(this.model.scene)
 
             this.model.scene.position.x = this.S1.x
+            this.anchor.add(this.camera)
         }
     }
 
     update() {
-        // const { x } = this.model.scene.position
+        if (this.helpers) this.helpers.removeArrowHelper()
+        this.helpers.showArrowHelper(
+            this.model.scene.position,
+            this.model.scene.position,
+            2,
+            '#ffffff'
+        )
 
-        // if (x < -0.1) {
-        //     this.A = new THREE.Vector2(0.0002, 0)
-        // } else if (x > 0.1) {
-        //     this.A = new THREE.Vector2(-0.0002, 0)
-        // } else console.log(x)
+        const p = this.camera.position.clone()
+        this.camera.getWorldPosition(p)
 
-        // Update logic
-        // this.V = this.V.add(this.A)
+        if (this.cameraHelpers) this.cameraHelpers.removeArrowHelper()
+        this.cameraHelpers.showArrowHelper(
+            // p.clone().normalize().sub(this.model.scene.position),
+            // new THREE.Vector3(-1, 0, 0),
+            p,
+            p,
+            2,
+            '#29abe2'
+        )
 
         this.V = this.V.add(this.A)
 
@@ -69,8 +92,7 @@ export default class Character {
         this.model.scene.position.x = this.S2.x
         this.model.scene.position.z = this.S2.y
 
-        // this.camera.position.y = this.model.scene.position.y + 4
-        // this.camera.position.x = this.model.scene.position.x + 4
+        this.anchor.position.x = this.model.scene.position.x
     }
 
     onMouseMove(e: MouseEvent) {
@@ -101,30 +123,6 @@ export default class Character {
         })
 
         this.controls.on('s_released', () => {
-            this.A.x = 0
-            this.A.y = 0
-        })
-
-        // Go left
-        this.controls.on('a_pressed', () => {
-            this.A = this.A.add(
-                new THREE.Vector2(0, Math.max(step_acceleration_z, max_acceleration_z))
-            )
-        })
-
-        this.controls.on('a_released', () => {
-            this.A.x = 0
-            this.A.y = 0
-        })
-
-        // Go right
-        this.controls.on('d_pressed', () => {
-            this.A = this.A.add(
-                new THREE.Vector2(0, Math.max(-step_acceleration_z, -max_acceleration_z))
-            )
-        })
-
-        this.controls.on('d_released', () => {
             this.A.x = 0
             this.A.y = 0
         })
