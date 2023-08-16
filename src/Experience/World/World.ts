@@ -24,8 +24,6 @@ export default class World {
             // Setup
             this._environment = new Environment()
             this.plini = new Plini()
-
-            // this.camera.parent = this.plini.model.scene
         })
 
         this.helpers = new Helpers()
