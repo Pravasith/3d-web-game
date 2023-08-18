@@ -19,7 +19,7 @@ export default class Camera {
         // init
         this.setInstance()
 
-        this.setOrbitControls()
+        // this.setOrbitControls()
         // this.setPointerLockControls()
     }
 

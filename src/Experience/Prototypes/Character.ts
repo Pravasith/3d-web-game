@@ -4,6 +4,7 @@ import Controls from './Controls'
 import Time from '../Time'
 import * as THREE from 'three'
 import Helpers from '../Helpers'
+import Tween from '../Tween'
 
 // const max_velocity_x = 0.08
 // const max_velocity_z = 0.08 / 4
@@ -21,6 +22,7 @@ export default class Character {
     private camera: THREE.PerspectiveCamera
     private controls: Controls
     private time: Time
+    private tween: Tween
 
     private max_velocity_z = 0.08
     private max_velocity_x = 0.08
@@ -36,6 +38,7 @@ export default class Character {
 
     private anchor: THREE.Object3D
     private helpers: Helpers
+    private cameraDir: THREE.Vector3
 
     line: THREE.Line
     sphere: THREE.Mesh
@@ -54,7 +57,6 @@ export default class Character {
             color: `rgb(255, 0, 0)`,
         })
         const sphere = new THREE.Mesh(geometry, material)
-        sphere.position.set(0, 0, 0)
 
         this.scene.add(sphere)
         this.sphere = sphere
@@ -64,6 +66,11 @@ export default class Character {
 
         this.V = new THREE.Vector3()
         this.A = new THREE.Vector3()
+
+        this.cameraDir = new THREE.Vector3()
+        this.camera.getWorldDirection(this.cameraDir)
+
+        this.tween = new Tween()
     }
 
     setModel(model: GLTF) {
@@ -72,7 +79,6 @@ export default class Character {
         } else {
             this.model = model
             this.scene.add(this.model.scene)
-            this.model.scene.rotation.y = Math.PI / 2
 
             this.model.scene.position.x = this.S1.x
         }
@@ -94,28 +100,22 @@ export default class Character {
 
         this.anchor.position.x = this.model.scene.position.x
 
-        const C = this.camera.position.clone()
-        this.camera.getWorldPosition(C)
-        const M = this.model.scene.position.clone()
+        // const C = this.camera.position.clone()
+        // this.camera.getWorldPosition(C)
+        // const M = this.model.scene.position.clone()
 
-        const X = M.sub(C)
+        // const X = M.sub(C)
+        this.camera.getWorldDirection(this.cameraDir)
 
         // if (this.helpers) this.helpers.removeArrowHelper()
-        // this.helpers.showArrowHelper(
-        //   this.model.scene.position,
-        //   this.model.scene.position,
-        //   2,
-        //   '#ffffff'
-        // )
+        // this.helpers.showArrowHelper(this.cameraDir, this.model.scene.position, 2, '#ffffff')
 
-        {
-            // delete
-            // this.sphere.position.set(
-            //     this.model.scene.position.x + -X.x / this.dummy,
-            //     -X.y / this.dummy,
-            //     -X.z / this.dummy
-            // )
-        }
+        // this.model.scene.rotation.y = THREE.MathUtils.damp(
+        //     this.model.scene.rotation.y,
+        //     this.anchor.rotation.y,
+        //     2,
+        //     this.time.delta
+        // )
     }
 
     onMouseMove(e: MouseEvent) {
@@ -128,8 +128,9 @@ export default class Character {
             throw new Error('Oops! You need to call the setModel first')
         } else {
             this.anchor = new THREE.Object3D()
-            this.anchor.position.set(0, 0, 1)
+            this.anchor.position.set(0, 0, 0)
             this.scene.add(this.anchor)
+
             this.sphere.position.copy(this.anchor.position)
 
             // Parent camera to anchor
@@ -148,6 +149,28 @@ export default class Character {
                 //     Math.max(step_acceleration_z, max_acceleration_z)
                 //   )
                 // )
+                //
+                // this.model.scene.rotation.y = THREE.MathUtils.damp(
+                //     this.model.scene.rotation.y,
+                //     this.anchor.rotation.y,
+                //     2,
+                //     this.time.delta * (1 / 1000) * 500
+                // )
+
+                this.tween.to(
+                    500,
+                    timeElapsed => {
+                        // console.log(timeElapsed)
+                        this.model.scene.rotation.y = THREE.MathUtils.damp(
+                            this.model.scene.rotation.y,
+                            this.anchor.rotation.y,
+                            2,
+                            timeElapsed * (1 / 1000)
+                            // this.time.delta * (1 / 1000) * 500
+                        )
+                    },
+                    's-press'
+                )
             })
 
             this.controls.on('w_released', () => {
