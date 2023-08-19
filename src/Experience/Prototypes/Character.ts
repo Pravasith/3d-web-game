@@ -40,8 +40,6 @@ export default class Character {
     private helpers: Helpers
     private cameraDir: THREE.Vector3
 
-    line: THREE.Line
-    sphere: THREE.Mesh
     size = 0.2
     dummy = 2
 
@@ -51,15 +49,6 @@ export default class Character {
         this.camera = Experience.camera.instance
 
         this.helpers = new Helpers()
-
-        const geometry = new THREE.SphereGeometry(this.size, this.size, this.size)
-        const material = new THREE.MeshBasicMaterial({
-            color: `rgb(255, 0, 0)`,
-        })
-        const sphere = new THREE.Mesh(geometry, material)
-
-        this.scene.add(sphere)
-        this.sphere = sphere
 
         this.S1 = new THREE.Vector3()
         this.S2 = new THREE.Vector3()
@@ -119,8 +108,28 @@ export default class Character {
     }
 
     onMouseMove(e: MouseEvent) {
-        this.anchor.rotation.y -= e.movementX * 0.001
-        this.anchor.rotation.x += e.movementY * 0.001
+        this.tween.debounce(
+            6,
+            () => {
+                this.anchor.rotation.y = THREE.MathUtils.damp(
+                    this.anchor.rotation.y,
+                    this.anchor.rotation.y - e.movementX * 0.005,
+                    2,
+                    this.time.delta
+                )
+
+                // this.anchor.rotation.y -= e.movementX * 0.0002 * this.time.delta
+                // this.anchor.rotation.x += e.movementY * 0.0002 * this.time.delta
+
+                this.anchor.rotation.x = THREE.MathUtils.damp(
+                    this.anchor.rotation.y,
+                    this.anchor.rotation.x + e.movementY * 0.005,
+                    2,
+                    this.time.delta
+                )
+            },
+            'rotate-character'
+        )
     }
 
     setControls() {
@@ -130,8 +139,6 @@ export default class Character {
             this.anchor = new THREE.Object3D()
             this.anchor.position.set(0, 0, 0)
             this.scene.add(this.anchor)
-
-            this.sphere.position.copy(this.anchor.position)
 
             // Parent camera to anchor
             this.anchor.add(this.camera)
@@ -149,27 +156,23 @@ export default class Character {
                 //     Math.max(step_acceleration_z, max_acceleration_z)
                 //   )
                 // )
-                //
-                // this.model.scene.rotation.y = THREE.MathUtils.damp(
-                //     this.model.scene.rotation.y,
-                //     this.anchor.rotation.y,
-                //     2,
-                //     this.time.delta * (1 / 1000) * 500
-                // )
+
+                const frequency = 800
+                const dampFactor = 5
+
+                const dT = this.time.delta * (1 / 1000) * dampFactor
 
                 this.tween.to(
-                    500,
-                    timeElapsed => {
-                        // console.log(timeElapsed)
+                    frequency,
+                    _ => {
                         this.model.scene.rotation.y = THREE.MathUtils.damp(
                             this.model.scene.rotation.y,
                             this.anchor.rotation.y,
                             2,
-                            timeElapsed * (1 / 1000)
-                            // this.time.delta * (1 / 1000) * 500
+                            dT
                         )
                     },
-                    's-press'
+                    'lerp-me'
                 )
             })
 
@@ -180,6 +183,7 @@ export default class Character {
 
             // Move backward
             this.controls.on('s_pressed', () => {
+                console.log(this.model.scene.rotation.y, this.anchor.rotation.y)
                 // this.A = this.A.add(
                 //   new THREE.Vector3(
                 //     -Math.max(step_acceleration_x, max_acceleration_x),

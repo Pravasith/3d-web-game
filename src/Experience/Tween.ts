@@ -12,23 +12,43 @@ export default class Tween {
         this.to_uIds = new Set()
     }
 
-    to(duration: number, callback: (timeElapsed: number) => void, uId: string) {
+    to(frequency: number, callback: (timeElapsed: number) => void, uId: string) {
+        let startTime = this.time.current
+
         if (!this.to_uIds.has(uId)) {
             this.to_uIds.add(uId)
-            let iId: number
-            let timeElapsed = 0
+            let timeElapsed = this.time.current - startTime
 
-            iId = setInterval(() => {
-                if (timeElapsed <= duration) {
-                    timeElapsed++
+            // iId = setInterval(() => {
+            //     if (timeElapsed <= duration) {
+            //         timeElapsed = this.time.current - startTime
+            //         callback(timeElapsed)
+            //     } else {
+            //         clearInterval(iId)
+            //         this.to_uIds.delete(uId)
+            //         timeElapsed = this.time.current
+            //         console.log('finished')
+            //     }
+            // }, 1)
+
+            const tick = () => {
+                if (timeElapsed <= frequency) {
+                    timeElapsed = this.time.current - startTime
                     callback(timeElapsed)
+
+                    window.requestAnimationFrame(() => {
+                        tick()
+                    })
                 } else {
-                    clearInterval(iId)
                     this.to_uIds.delete(uId)
-                    // console.log(timeElapsed)
-                    timeElapsed = 0
+                    timeElapsed = this.time.current
+                    console.log('loop finished')
                 }
-            }, 1)
+            }
+
+            window.requestAnimationFrame(() => {
+                tick()
+            })
         }
     }
 
