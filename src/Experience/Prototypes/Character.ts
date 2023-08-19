@@ -129,7 +129,7 @@ export default class Character {
                     new THREE.Vector2(
                         this.CameraDir_v.x * this.acceleration_z,
                         this.CameraDir_v.z * this.acceleration_z
-                    )
+                    ).clampScalar(-this.max_acceleration_z, this.max_acceleration_z)
                 )
 
                 console.log('--')
