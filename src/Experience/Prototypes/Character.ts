@@ -14,7 +14,7 @@ export default class Character {
     private time: Time
     private tween: Tween
 
-    private max_velocity_z = 0.8
+    private max_velocity_z = 0.2
     private max_velocity_x = 0.02
 
     private acceleration_z = 0.0025
@@ -62,9 +62,8 @@ export default class Character {
     }
 
     update() {
-        this.V_v.add(this.A_v)
+        this.V_v.add(this.A_v.clampScalar(-this.max_velocity_z, this.max_velocity_z))
 
-        this.V_v.clampScalar(-this.max_velocity_z, this.max_velocity_z)
         this.V_v.sub(new THREE.Vector2(this.V_v.x * this.mass, this.V_v.y * this.mass))
 
         this.S_v.add(this.V_v)
@@ -81,27 +80,28 @@ export default class Character {
     }
 
     onMouseMove(e: MouseEvent) {
-        const rotateMouse = () => {
-            this.anchor.rotation.y = THREE.MathUtils.damp(
-                this.anchor.rotation.y,
-                this.anchor.rotation.y - e.movementX * 0.005,
-                2,
-                this.time.delta
-            )
+        this.tween.debounce(
+            6,
+            () => {
+                // Character Transolation
 
-            // this.anchor.rotation.y -= e.movementX * 0.0002 * this.time.delta
-            // this.anchor.rotation.x += e.movementY * 0.0002 * this.time.delta
+                // Character Rotation
+                this.anchor.rotation.y = THREE.MathUtils.damp(
+                    this.anchor.rotation.y,
+                    this.anchor.rotation.y - e.movementX * 0.005,
+                    2,
+                    this.time.delta
+                )
 
-            this.anchor.rotation.x = THREE.MathUtils.damp(
-                this.anchor.rotation.y,
-                this.anchor.rotation.x + e.movementY * 0.005,
-                2,
-                this.time.delta
-            )
-        }
-        // rotateMouse()
-
-        this.tween.debounce(6, rotateMouse, 'rotate-character')
+                this.anchor.rotation.x = THREE.MathUtils.damp(
+                    this.anchor.rotation.y,
+                    this.anchor.rotation.x + e.movementY * 0.005,
+                    2,
+                    this.time.delta
+                )
+            },
+            'rotate-character'
+        )
     }
 
     setControls() {
