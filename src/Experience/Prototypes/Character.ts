@@ -14,14 +14,11 @@ export default class Character {
     private time: Time
     private tween: Tween
 
-    private max_velocity_z = 0.2
-    private max_velocity_x = 0.02
+    private max_velocity_z = 0.5
+    private max_acceleration_z = 0.05
+    private acceleration_z = 0.005
 
-    private acceleration_z = 0.0025
-    private acceleration_x = 0.00025
-
-    private max_acceleration_z = 0.01
-    private max_acceleration_x = 0.01
+    private mass: number = 5
 
     private S_v: THREE.Vector2 // Displacement
     private V_v: THREE.Vector2 // Velocity
@@ -29,8 +26,6 @@ export default class Character {
 
     private anchor: THREE.Object3D
     private CameraDir_v: THREE.Vector3
-
-    private mass: number
 
     constructor() {
         this.scene = Experience.scene
@@ -47,7 +42,6 @@ export default class Character {
         this.camera.getWorldDirection(this.CameraDir_v)
 
         this.tween = new Tween()
-        this.mass = 0.1
     }
 
     setModel(model: GLTF) {
@@ -61,24 +55,6 @@ export default class Character {
         }
     }
 
-    update() {
-        this.V_v.add(this.A_v.clampScalar(-this.max_velocity_z, this.max_velocity_z))
-
-        this.V_v.sub(new THREE.Vector2(this.V_v.x * this.mass, this.V_v.y * this.mass))
-
-        this.S_v.add(this.V_v)
-
-        this.model.scene.position.x = this.S_v.x
-        this.model.scene.position.z = this.S_v.y
-
-        this.anchor.position.copy(this.model.scene.position)
-
-        this.camera.getWorldDirection(this.CameraDir_v)
-
-        // if (this.helpers) this.helpers.removeArrowHelper()
-        // this.helpers.showArrowHelper(this.CameraDir_v, this.model.scene.position, 2, '#ffffff')
-    }
-
     onMouseMove(e: MouseEvent) {
         this.tween.debounce(
             6,
@@ -88,20 +64,50 @@ export default class Character {
                 // Character Rotation
                 this.anchor.rotation.y = THREE.MathUtils.damp(
                     this.anchor.rotation.y,
-                    this.anchor.rotation.y - e.movementX * 0.005,
+                    this.anchor.rotation.y - e.movementX * 0.0025,
                     2,
                     this.time.delta
                 )
 
                 this.anchor.rotation.x = THREE.MathUtils.damp(
                     this.anchor.rotation.y,
-                    this.anchor.rotation.x + e.movementY * 0.005,
+                    this.anchor.rotation.x + e.movementY * 0.001,
                     2,
                     this.time.delta
                 )
             },
             'rotate-character'
         )
+    }
+
+    update() {
+        this.V_v.add(this.A_v.clampLength(-this.max_velocity_z, this.max_velocity_z))
+
+        this.V_v.sub(
+            new THREE.Vector2(this.V_v.x * 0.01 * this.mass, this.V_v.y * 0.01 * this.mass)
+        )
+
+        this.S_v.add(this.V_v)
+
+        this.model.scene.position.x = THREE.MathUtils.damp(
+            this.model.scene.position.x,
+            this.S_v.x,
+            2,
+            this.time.delta
+        )
+        this.model.scene.position.z = THREE.MathUtils.damp(
+            this.model.scene.position.z,
+            this.S_v.y,
+            2,
+            this.time.delta
+        )
+
+        this.anchor.position.copy(this.model.scene.position)
+
+        this.camera.getWorldDirection(this.CameraDir_v)
+
+        // if (this.helpers) this.helpers.removeArrowHelper()
+        // this.helpers.showArrowHelper(this.CameraDir_v, this.model.scene.position, 2, '#ffffff')
     }
 
     setControls() {
@@ -129,7 +135,7 @@ export default class Character {
                     new THREE.Vector2(
                         this.CameraDir_v.x * this.acceleration_z,
                         this.CameraDir_v.z * this.acceleration_z
-                    ).clampScalar(-this.max_acceleration_z, this.max_acceleration_z)
+                    ).clampLength(-this.max_acceleration_z, this.max_acceleration_z)
                 )
 
                 console.log('--')
