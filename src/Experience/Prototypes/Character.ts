@@ -19,6 +19,8 @@ export default class Character {
     private acceleration_z = 0.005
 
     private mass: number = 5
+    private turnDuration = 800
+    private turnDampFactor = 5
 
     private S_v: THREE.Vector2 // Displacement
     private V_v: THREE.Vector2 // Velocity
@@ -26,6 +28,7 @@ export default class Character {
 
     private anchor: THREE.Object3D
     private CameraDir_v: THREE.Vector3
+    private CameraDirCopy_v: THREE.Vector3
 
     constructor() {
         this.scene = Experience.scene
@@ -39,6 +42,8 @@ export default class Character {
         this.A_v = new THREE.Vector2()
 
         this.CameraDir_v = new THREE.Vector3()
+        this.CameraDirCopy_v = new THREE.Vector3()
+
         this.camera.getWorldDirection(this.CameraDir_v)
 
         this.tween = new Tween()
@@ -105,9 +110,68 @@ export default class Character {
         this.anchor.position.copy(this.model.scene.position)
 
         this.camera.getWorldDirection(this.CameraDir_v)
+        this.CameraDirCopy_v.copy(this.CameraDir_v)
 
         // if (this.helpers) this.helpers.removeArrowHelper()
         // this.helpers.showArrowHelper(this.CameraDir_v, this.model.scene.position, 2, '#ffffff')
+    }
+
+    moveForwardOrBackward(dir: 1 | -1) {
+        // Character Translation
+        this.A_v.add(
+            new THREE.Vector2(
+                dir * this.CameraDir_v.x * this.acceleration_z,
+                dir * this.CameraDir_v.z * this.acceleration_z
+            ).clampLength(-this.max_acceleration_z, this.max_acceleration_z)
+        )
+
+        // console.log('--')
+        // console.log('V: ', this.V_v.x, this.V_v.y)
+        // console.log('A: ', this.A_v.x, this.A_v.y)
+        // console.log('Cam: ', this.CameraDir_v.x, this.CameraDir_v.y)
+
+        // Character Rotation
+        this.tween.to(
+            this.turnDuration,
+            _ => {
+                this.model.scene.rotation.y = THREE.MathUtils.damp(
+                    this.model.scene.rotation.y,
+                    this.anchor.rotation.y % (2 * Math.PI),
+                    2,
+                    this.time.delta * (1 / 1000) * this.turnDampFactor
+                )
+            },
+            'character-lerp-' + (!(dir + 1) ? 's' : 'w')
+        )
+    }
+
+    moveLeftOrRight(dir: 1 | -1) {
+        // Character Translation
+        this.A_v.add(
+            new THREE.Vector2(
+                dir * this.CameraDir_v.x * this.acceleration_z,
+                dir * this.CameraDir_v.z * this.acceleration_z
+            ).clampLength(-this.max_acceleration_z, this.max_acceleration_z)
+        )
+
+        // console.log('--')
+        // console.log('V: ', this.V_v.x, this.V_v.y)
+        // console.log('A: ', this.A_v.x, this.A_v.y)
+        // console.log('Cam: ', this.CameraDir_v.x, this.CameraDir_v.y)
+
+        // Character Rotation
+        this.tween.to(
+            this.turnDuration,
+            _ => {
+                this.model.scene.rotation.y = THREE.MathUtils.damp(
+                    this.model.scene.rotation.y,
+                    this.anchor.rotation.y % (2 * Math.PI),
+                    2,
+                    this.time.delta * (1 / 1000) * this.turnDampFactor
+                )
+            },
+            'character-lerp-' + (!(dir + 1) ? 's' : 'w')
+        )
     }
 
     setControls() {
@@ -125,39 +189,9 @@ export default class Character {
             this.controls = new Controls()
             this.controls.setContols((e: MouseEvent) => this.onMouseMove(e))
 
-            const frequency = 800
-            const dampFactor = 5
-
             // Move forward
             this.controls.on('w_pressed', () => {
-                // Character Translation
-                this.A_v.add(
-                    new THREE.Vector2(
-                        this.CameraDir_v.x * this.acceleration_z,
-                        this.CameraDir_v.z * this.acceleration_z
-                    ).clampLength(-this.max_acceleration_z, this.max_acceleration_z)
-                )
-
-                console.log('--')
-                console.log('V: ', this.V_v.x, this.V_v.y)
-                console.log('A: ', this.A_v.x, this.A_v.y)
-                console.log('Cam: ', this.CameraDir_v.x, this.CameraDir_v.y)
-
-                // Character Rotation
-                const dT = this.time.delta * (1 / 1000) * dampFactor
-
-                this.tween.to(
-                    frequency,
-                    _ => {
-                        this.model.scene.rotation.y = THREE.MathUtils.damp(
-                            this.model.scene.rotation.y,
-                            this.anchor.rotation.y,
-                            2,
-                            dT
-                        )
-                    },
-                    'character-lerp-w'
-                )
+                this.moveForwardOrBackward(1)
             })
 
             this.controls.on('w_released', () => {
@@ -167,14 +201,7 @@ export default class Character {
 
             // Move backward
             this.controls.on('s_pressed', () => {
-                console.log(this.model.scene.rotation.y, this.anchor.rotation.y)
-                // this.A_v = this.A_v.add(
-                //   new THREE.Vector3(
-                //     -Math.max(step_acceleration_x, max_acceleration_x),
-                //     0,
-                //     -Math.max(step_acceleration_z, max_acceleration_z)
-                //   )
-                // )
+                this.moveForwardOrBackward(-1)
             })
 
             this.controls.on('s_released', () => {
