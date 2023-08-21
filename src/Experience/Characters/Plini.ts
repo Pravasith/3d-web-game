@@ -2,7 +2,7 @@ import Character from '../Prototypes/Character'
 import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader'
 import { Experience } from '../Experience'
 import { LOAD_ITEMS } from '../constants/sources'
-import { Mesh, MeshPhongMaterial } from 'three'
+import { Mesh, MeshPhongMaterial, MeshStandardMaterial } from 'three'
 
 export default class Plini extends Character {
     constructor() {
@@ -11,7 +11,7 @@ export default class Plini extends Character {
 
         this.setModel(model)
         this.setControls()
-        const material = new MeshPhongMaterial({ color: '#ffffff' })
+        const material = new MeshStandardMaterial({ color: '#ffffff' })
 
         model.scene.traverse(o => {
             if ((o as Mesh).isMesh) {

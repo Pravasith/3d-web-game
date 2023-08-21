@@ -5,6 +5,8 @@ import Resources from '../Utils/Resources'
 import Plini from '../Characters/Plini'
 import Helpers from '../Helpers'
 import { randFloat } from 'three/src/math/MathUtils'
+import { LOAD_ITEMS } from '../constants/sources'
+import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader'
 
 export default class World {
     private camera: THREE.PerspectiveCamera
@@ -13,6 +15,7 @@ export default class World {
     private plini: Plini
     private helpers: Helpers
     private scene: THREE.Scene
+    private terrain: GLTF
 
     constructor() {
         this.camera = Experience.camera.instance
@@ -23,13 +26,27 @@ export default class World {
         this.resources.on('ready', () => {
             // Setup
             this._environment = new Environment()
+
             this.plini = new Plini()
+
+            this.terrain = Experience.resources.items[LOAD_ITEMS.TERRAIN] as GLTF
+            const material = new THREE.MeshStandardMaterial({ color: '#db3300' })
+
+            this.terrain.scene.traverse(o => {
+                if ((o as THREE.Mesh).isMesh) {
+                    ;(o as THREE.Mesh).material = material
+                }
+            })
+            this.terrain.scene.position.y = -40
+
+            this.scene.add(this.terrain.scene)
+            const cubeMap = Experience.resources.items[LOAD_ITEMS.ENV_MAP_TEXTURE]
+            // this.scene.background = cubeMap
+            // this._environment.spotLight.target.copy(this.plini.model.scene)
         })
 
         this.helpers = new Helpers()
         this.helpers.showAxesHelper()
-
-        this.deleteThis()
     }
 
     update() {
@@ -39,28 +56,6 @@ export default class World {
             // this.camera.lookAt(this.plini.model.scene.position)
             // this.camera.position.x = this.plini.model.scene.position.x + 4
             // this.camera.position.z = this.plini.model.scene.position.z + 0
-        }
-    }
-
-    deleteThis() {
-        for (let i = 0; i < 1500; i++) {
-            const randX = randFloat(-50, 50)
-            const randY = randFloat(-50, 50)
-            const randZ = randFloat(-50, 50)
-
-            const geometry = new THREE.SphereGeometry(0.02, 0.02, 0.02)
-            const material = new THREE.MeshBasicMaterial({
-                color: `rgb(
-                  ${Math.floor((Math.abs(randX) * 255) / 50)}, 
-                  ${Math.floor((Math.abs(randY) * 255) / 50)},
-                  ${Math.floor((Math.abs(randZ) * 255) / 50)}
-                )`,
-            })
-            const sphere = new THREE.Mesh(geometry, material)
-
-            sphere.position.set(randX, randFloat(-8, 8), randFloat(-8, 8))
-
-            this.scene.add(sphere)
         }
     }
 }
