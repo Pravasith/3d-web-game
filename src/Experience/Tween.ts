@@ -22,6 +22,7 @@ export default class Tween {
             const tick = () => {
                 if (timeElapsed <= frequency) {
                     timeElapsed = this.time.current - startTime
+
                     callback(timeElapsed)
 
                     window.requestAnimationFrame(() => {

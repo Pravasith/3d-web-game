@@ -16,28 +16,33 @@ export default class Character {
     private time: Time
     private tween: Tween
 
-    private max_velocity_z = 0.5
-    private max_acceleration_z = 0.05
-    private acceleration_z = 0.005
+    private readonly max_velocity = 0.5
+    private readonly max_acceleration = 0.05
+    private readonly acceleration = 0.005
 
     private mass: number = 5
-    // private turnDuration = 2000 // 800
-    private turnDuration = 800 // 800
+    private turnDuration = 400 // 800
     private turnDampFactor = 5
 
-    private S_v: THREE.Vector2 // Displacement
-    private V_v: THREE.Vector2 // Velocity
-    private A_v: THREE.Vector2 // Acceleration
+    private S_v2: THREE.Vector2 // Displacement
+    private V_v2: THREE.Vector2 // Velocity
+    private A_v2: THREE.Vector2 // Acceleration
 
     private anchor: THREE.Object3D
-    private CameraDir_v: THREE.Vector3
-    private CameraDir_Hor_Plane: THREE.Vector2
+    private CameraDir_v3: THREE.Vector3
+    private CameraDir_v2: THREE.Vector2
 
-    helpers: Helpers
+    private helpers: Helpers
 
-    cameraDirHelper: THREE.ArrowHelper
-    modelDirHelper: THREE.ArrowHelper
-    modelPointer_V: THREE.Vector2
+    private cameraDirHelper: THREE.ArrowHelper
+
+    private modelDirHelper: THREE.ArrowHelper
+    private ModelDir_v2: THREE.Vector2
+
+    private ModelForwardDir_v3_world: THREE.Vector3
+    private ModelOrigin_v3_world: THREE.Vector3
+
+    modelRotation_y: number
 
     constructor() {
         this.scene = Experience.scene
@@ -46,16 +51,16 @@ export default class Character {
 
         this.helpers = new Helpers()
 
-        this.S_v = new THREE.Vector2()
-        this.V_v = new THREE.Vector2()
-        this.A_v = new THREE.Vector2()
+        this.S_v2 = new THREE.Vector2()
+        this.V_v2 = new THREE.Vector2()
+        this.A_v2 = new THREE.Vector2()
 
-        this.CameraDir_v = new THREE.Vector3()
-        this.CameraDir_Hor_Plane = new THREE.Vector2()
+        this.CameraDir_v3 = new THREE.Vector3()
+        this.CameraDir_v2 = new THREE.Vector2()
 
-        this.modelPointer_V = new THREE.Vector2()
+        this.ModelDir_v2 = new THREE.Vector2()
 
-        this.camera.getWorldDirection(this.CameraDir_v)
+        this.camera.getWorldDirection(this.CameraDir_v3)
 
         this.tween = new Tween()
     }
@@ -67,12 +72,12 @@ export default class Character {
             this.model = model
             this.scene.add(this.model.scene)
 
-            this.model.scene.position.x = this.S_v.x
+            this.model.scene.position.x = this.S_v2.x
 
-            this.helpers.showArrowHelper(this.CameraDir_v, this.model.scene.position, 2, '#29abe2')
+            this.helpers.showArrowHelper(this.CameraDir_v3, this.model.scene.position, 2, '#29abe2')
             this.cameraDirHelper = this.helpers.arrowHelper
 
-            this.helpers.showArrowHelper(this.CameraDir_v, this.model.scene.position, 2, '#ffffff')
+            this.helpers.showArrowHelper(this.CameraDir_v3, this.model.scene.position, 2, '#ffffff')
             this.modelDirHelper = this.helpers.arrowHelper
         }
     }
@@ -83,7 +88,7 @@ export default class Character {
             () => {
                 // Character Rotation
                 this.anchor.rotation.y =
-                    this.anchor.rotation.y - e.movementX * 0.0001 * this.time.delta
+                    (this.anchor.rotation.y - e.movementX * 0.0001 * this.time.delta) % TAU
 
                 // this.anchor.rotation.y = THREE.MathUtils.damp(
                 //     this.anchor.rotation.y,
@@ -104,88 +109,82 @@ export default class Character {
     }
 
     update() {
-        this.V_v.add(this.A_v.clampLength(-this.max_velocity_z, this.max_velocity_z))
+        this.V_v2.add(this.A_v2.clampLength(-this.max_velocity, this.max_velocity))
 
-        this.V_v.sub(
-            new THREE.Vector2(this.V_v.x * 0.01 * this.mass, this.V_v.y * 0.01 * this.mass)
+        this.V_v2.sub(
+            new THREE.Vector2(this.V_v2.x * 0.01 * this.mass, this.V_v2.y * 0.01 * this.mass)
         )
 
-        this.S_v.add(this.V_v)
+        this.S_v2.add(this.V_v2)
 
-        // The sexiest function known to man
         this.model.scene.position.x = THREE.MathUtils.damp(
             this.model.scene.position.x,
-            this.S_v.x,
+            this.S_v2.x,
             2,
             this.time.delta
         )
 
         this.model.scene.position.z = THREE.MathUtils.damp(
             this.model.scene.position.z,
-            this.S_v.y,
+            this.S_v2.y,
             2,
             this.time.delta
         )
 
         this.anchor.position.copy(this.model.scene.position)
 
-        this.camera.getWorldDirection(this.CameraDir_v)
-        this.CameraDir_Hor_Plane.x = this.CameraDir_v.x
-        this.CameraDir_Hor_Plane.y = this.CameraDir_v.z
-        this.CameraDir_Hor_Plane.normalize()
+        this.camera.getWorldDirection(this.CameraDir_v3)
+        this.CameraDir_v2.x = this.CameraDir_v3.x
+        this.CameraDir_v2.y = this.CameraDir_v3.z
+        this.CameraDir_v2.normalize()
 
         // if (this.helpers) this.helpers.removeArrowHelper()
-        // this.helpers.showArrowHelper(this.CameraDir_v, this.model.scene.position, 2, '#ffffff')
+        // this.helpers.showArrowHelper(this.CameraDir_v3, this.model.scene.position, 2, '#ffffff')
 
         this.cameraDirHelper.position.copy(this.model.scene.position)
         this.cameraDirHelper.setDirection(
-            new THREE.Vector3(this.CameraDir_Hor_Plane.x, 0, this.CameraDir_Hor_Plane.y)
+            new THREE.Vector3(this.CameraDir_v2.x, 0, this.CameraDir_v2.y)
         )
 
         this.modelDirHelper.position.copy(this.model.scene.position)
         this.modelDirHelper.setDirection(
-            new THREE.Vector3(this.modelPointer_V.x, 0, this.modelPointer_V.y)
+            new THREE.Vector3(this.ModelDir_v2.x, 0, this.ModelDir_v2.y)
         )
 
-        const temp_V = this.model.scene.localToWorld(new THREE.Vector3(0, 0, 2))
-        const temp_V2 = this.model.scene.localToWorld(new THREE.Vector3(0, 0, 1))
+        this.ModelForwardDir_v3_world = this.model.scene.localToWorld(new THREE.Vector3(0, 0, 1))
+        this.ModelOrigin_v3_world = this.model.scene.localToWorld(new THREE.Vector3())
 
-        temp_V.sub(temp_V2)
-        temp_V.normalize()
+        this.ModelForwardDir_v3_world.sub(this.ModelOrigin_v3_world)
+        this.ModelForwardDir_v3_world.normalize()
 
-        this.modelPointer_V = new THREE.Vector2(temp_V.x, temp_V.z)
-        this.modelPointer_V.normalize()
+        this.ModelDir_v2.x = this.ModelForwardDir_v3_world.x
+        this.ModelDir_v2.y = this.ModelForwardDir_v3_world.z
+        this.ModelDir_v2.normalize()
     }
 
     moveForwardOrBackward(dir: 1 | -1) {
         // Character Translation
-        this.A_v.add(
+        this.A_v2.add(
             new THREE.Vector2(
-                dir * this.CameraDir_Hor_Plane.x * this.acceleration_z,
-                dir * this.CameraDir_Hor_Plane.y * this.acceleration_z
-            ).clampLength(-this.max_acceleration_z, this.max_acceleration_z)
+                dir * this.CameraDir_v2.x * this.acceleration,
+                dir * this.CameraDir_v2.y * this.acceleration
+            ).clampLength(-this.max_acceleration, this.max_acceleration)
         )
-
-        // console.log('--')
-        // console.log('V: ', this.V_v.x, this.V_v.y)
-        // console.log('A: ', this.A_v.x, this.A_v.y)
-        // console.log('Cam: ', this.CameraDir_v.x, this.CameraDir_v.y)
-        // this.v1.copy(this.model.scene.up).applyQuaternion(this.anchor.quaternion)
-
-        // console.log(this.CameraDir_Hor_Plane)
-
-        const finalValue = Math.acos(this.modelPointer_V.dot(this.CameraDir_Hor_Plane))
-        console.log(finalValue)
 
         // Character Rotation
         this.tween.to(
             this.turnDuration,
             _ => {
+                this.modelRotation_y =
+                    this.model.scene.rotation.y +
+                    +Math.acos(this.ModelDir_v2.dot(this.CameraDir_v2)).toFixed(4)
+                // console.log(this.modelRotation_y)
+
                 this.model.scene.rotation.y = THREE.MathUtils.damp(
                     this.model.scene.rotation.y,
-                    this.anchor.rotation.y,
+                    this.modelRotation_y,
                     2,
-                    this.time.delta * 0.001 * this.turnDampFactor
+                    this.time.delta * this.turnDampFactor * 0.002
                 )
             },
             'character-lerp-' + (!(dir + 1) ? 's' : 'w')
@@ -194,13 +193,13 @@ export default class Character {
 
     moveLeftOrRight(dir: 1 | -1) {
         // Character Translation
-        this.A_v.add(
+        this.A_v2.add(
             new THREE.Vector2(
                 // Rotate a vector trick
                 // See - https://limnu.com/sketch-easy-90-degree-rotate-vectors/
-                dir * this.CameraDir_v.z * this.acceleration_z,
-                dir * -this.CameraDir_v.x * this.acceleration_z
-            ).clampLength(-this.max_acceleration_z, this.max_acceleration_z)
+                dir * this.CameraDir_v3.z * this.acceleration,
+                dir * -this.CameraDir_v3.x * this.acceleration
+            ).clampLength(-this.max_acceleration, this.max_acceleration)
         )
 
         // Character Rotation
@@ -237,23 +236,21 @@ export default class Character {
             // Move forward
             this.controls.on('w_pressed', () => {
                 this.moveForwardOrBackward(1)
-                // console.log('W')
             })
 
             this.controls.on('w_released', () => {
-                this.A_v.x = 0
-                this.A_v.y = 0
+                this.A_v2.x = 0
+                this.A_v2.y = 0
             })
 
             // Move backward
             this.controls.on('s_pressed', () => {
                 this.moveForwardOrBackward(-1)
-                // console.log('S')
             })
 
             this.controls.on('s_released', () => {
-                this.A_v.x = 0
-                this.A_v.y = 0
+                this.A_v2.x = 0
+                this.A_v2.y = 0
             })
 
             // Move left
@@ -262,8 +259,8 @@ export default class Character {
             })
 
             this.controls.on('a_released', () => {
-                this.A_v.x = 0
-                this.A_v.y = 0
+                this.A_v2.x = 0
+                this.A_v2.y = 0
             })
 
             // Move backward
@@ -272,8 +269,8 @@ export default class Character {
             })
 
             this.controls.on('d_released', () => {
-                this.A_v.x = 0
-                this.A_v.y = 0
+                this.A_v2.x = 0
+                this.A_v2.y = 0
             })
         }
     }
