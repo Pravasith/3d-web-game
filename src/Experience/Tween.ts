@@ -19,18 +19,6 @@ export default class Tween {
             this.to_uIds.add(uId)
             let timeElapsed = this.time.current - startTime
 
-            // iId = setInterval(() => {
-            //     if (timeElapsed <= duration) {
-            //         timeElapsed = this.time.current - startTime
-            //         callback(timeElapsed)
-            //     } else {
-            //         clearInterval(iId)
-            //         this.to_uIds.delete(uId)
-            //         timeElapsed = this.time.current
-            //         console.log('finished')
-            //     }
-            // }, 1)
-
             const tick = () => {
                 if (timeElapsed <= frequency) {
                     timeElapsed = this.time.current - startTime
@@ -42,7 +30,7 @@ export default class Tween {
                 } else {
                     this.to_uIds.delete(uId)
                     timeElapsed = this.time.current
-                    console.log('loop finished')
+                    // console.log('loop finished')
                 }
             }
 
