@@ -32,7 +32,7 @@ export default class Controls extends EventEmitter {
         // this.anchor.position.set(4, 4, 0)
     }
 
-    public setContols(onMouseMove: (e: MouseEvent) => void) {
+    public setControls(onMouseMove: (e: MouseEvent) => void) {
         document.body.addEventListener('click', async () => {
             this.canvas.requestPointerLock()
         })
