@@ -177,8 +177,8 @@ export default class Character {
             _ => {
                 this.modelRotation_y =
                     this.model.scene.rotation.y +
-                    +Math.acos(this.ModelDir_v2.dot(this.CameraDir_v2)).toFixed(4)
-                // console.log(this.modelRotation_y)
+                    -Math.sign(this.ModelDir_v2.cross(this.CameraDir_v2)) *
+                        +Math.acos(this.ModelDir_v2.dot(this.CameraDir_v2)).toFixed(4)
 
                 this.model.scene.rotation.y = THREE.MathUtils.damp(
                     this.model.scene.rotation.y,
