@@ -6,15 +6,18 @@ import * as THREE from 'three'
 import Tween from '../Tween'
 import { PI, TAU } from '../constants/mathConstants'
 import Helpers from '../Helpers'
+import Debug from '../Utils/Debug'
 
 export default class Character {
     model: GLTF
+    modelRotation_y: number
 
     private scene: THREE.Scene
     private camera: THREE.PerspectiveCamera
     private controls: Controls
     private time: Time
     private tween: Tween
+    private debug: Debug
 
     private readonly max_velocity = 0.5
     private readonly max_acceleration = 0.05
@@ -42,8 +45,6 @@ export default class Character {
     private ModelForwardDir_v3_world: THREE.Vector3
     private ModelOrigin_v3_world: THREE.Vector3
 
-    modelRotation_y: number
-
     constructor() {
         this.scene = Experience.scene
         this.time = Experience.time
@@ -63,6 +64,7 @@ export default class Character {
         this.camera.getWorldDirection(this.CameraDir_v3)
 
         this.tween = new Tween()
+        this.debug = Experience.debug
     }
 
     setModel(model: GLTF) {
@@ -175,16 +177,13 @@ export default class Character {
         this.tween.to(
             this.turnDuration,
             _ => {
-                this.modelRotation_y =
-                    this.model.scene.rotation.y +
-                    -Math.sign(this.ModelDir_v2.cross(this.CameraDir_v2)) *
-                        +Math.acos(this.ModelDir_v2.dot(this.CameraDir_v2)).toFixed(4)
-
                 this.model.scene.rotation.y = THREE.MathUtils.damp(
                     this.model.scene.rotation.y,
-                    this.modelRotation_y,
+                    this.model.scene.rotation.y +
+                        -Math.sign(this.ModelDir_v2.cross(this.CameraDir_v2)) *
+                            +Math.acos(this.ModelDir_v2.dot(this.CameraDir_v2)).toFixed(4),
                     2,
-                    this.time.delta * this.turnDampFactor * 0.002
+                    this.time.delta * this.turnDampFactor * 0.004
                 )
             },
             'character-lerp-' + (!(dir + 1) ? 's' : 'w')

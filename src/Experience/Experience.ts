@@ -6,6 +6,7 @@ import * as THREE from 'three'
 import World from './World/World'
 import Resources from './Utils/Resources'
 import sources from './constants/sources'
+import Debug from './Utils/Debug'
 
 export class Experience {
     static instance: Experience
@@ -17,6 +18,7 @@ export class Experience {
     static renderer: Renderer
     static world: World
     static resources: Resources
+    static debug: Debug
 
     private constructor(canvas: HTMLCanvasElement) {
         // Options
@@ -30,6 +32,7 @@ export class Experience {
         Experience.renderer = new Renderer()
         Experience.resources = new Resources(sources)
         Experience.world = new World()
+        Experience.debug = new Debug()
 
         Experience.sizes.on('resize', () => {
             this.resize()
