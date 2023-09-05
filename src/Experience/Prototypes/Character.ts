@@ -45,6 +45,8 @@ export default class Character {
     private ModelForwardDir_v3_world: THREE.Vector3
     private ModelOrigin_v3_world: THREE.Vector3
 
+    private nullDir_v3: THREE.Vector3
+
     constructor() {
         this.scene = Experience.scene
         this.time = Experience.time
@@ -65,6 +67,8 @@ export default class Character {
 
         this.tween = new Tween()
         this.debug = Experience.debug
+
+        this.nullDir_v3 = new THREE.Vector3()
     }
 
     setModel(model: GLTF) {
@@ -166,22 +170,34 @@ export default class Character {
 
     moveForwardOrBackward(dir: 1 | -1) {
         // Character Translation
+        // console.log(this.CameraDir_v2.multiplyScalar(dir).x + ' uwu ')
+        this.CameraDir_v2.multiplyScalar(dir)
+
         this.A_v2.add(
             new THREE.Vector2(
-                dir * this.CameraDir_v2.x * this.acceleration,
-                dir * this.CameraDir_v2.y * this.acceleration
+                // this.CameraDir_v2.x * this.acceleration,
+                // this.CameraDir_v2.y * this.acceleration
+                this.CameraDir_v2.x * this.acceleration,
+                this.CameraDir_v2.y * this.acceleration
             ).clampLength(-this.max_acceleration, this.max_acceleration)
         )
+        // console.log(this.CameraDir_v2.x + ' Before')
+        // console.log(this.CameraDir_v2.multiplyScalar(dir).x + ' ')
+        // console.log(this.CameraDir_v2.x + ' After')
+        // console.log('')
 
         // Character Rotation
         this.tween.to(
             this.turnDuration,
             _ => {
+                // console.log(this.CameraDir_v2.x, ' uwu')
+                // console.log(this.CameraDir_v2.multiplyScalar(dir).x + ' uwu ')
+
                 this.model.scene.rotation.y = THREE.MathUtils.damp(
                     this.model.scene.rotation.y,
                     this.model.scene.rotation.y +
-                        -Math.sign(this.ModelDir_v2.cross(this.CameraDir_v2)) *
-                            +Math.acos(this.ModelDir_v2.dot(this.CameraDir_v2)).toFixed(4),
+                        -Math.sign(dir * this.ModelDir_v2.cross(this.CameraDir_v2)) *
+                            +Math.acos(dir * this.ModelDir_v2.dot(this.CameraDir_v2)).toFixed(4),
                     2,
                     this.time.delta * this.turnDampFactor * 0.004
                 )
@@ -194,7 +210,7 @@ export default class Character {
         // Character Translation
         this.A_v2.add(
             new THREE.Vector2(
-                // Rotate a vector trick
+                // Rotate a vector by 90 degrees trick
                 // See - https://limnu.com/sketch-easy-90-degree-rotate-vectors/
                 dir * this.CameraDir_v3.z * this.acceleration,
                 dir * -this.CameraDir_v3.x * this.acceleration
@@ -214,6 +230,22 @@ export default class Character {
             },
             'character-lerp-' + (!(dir + 1) ? 'd' : 'a')
         )
+
+        // // Character Rotation
+        // this.tween.to(
+        //     this.turnDuration,
+        //     _ => {
+        //         this.model.scene.rotation.y = THREE.MathUtils.damp(
+        //             this.model.scene.rotation.y,
+        //             this.model.scene.rotation.y +
+        //                 -Math.sign(this.ModelDir_v2.cross(this.CameraDir_v2)) *
+        //                     +Math.acos(this.ModelDir_v2.dot(this.CameraDir_v2)).toFixed(4),
+        //             2,
+        //             this.time.delta * this.turnDampFactor * 0.004
+        //         )
+        //     },
+        //     'character-lerp-' + (!(dir + 1) ? 's' : 'w')
+        // )
     }
 
     setControls() {
