@@ -20,11 +20,13 @@ export default class Controls extends EventEmitter {
         this.scene = Experience.scene
         this.canvas = Experience.canvas
 
-        window.addEventListener('keydown', (e: KeyboardEvent) => {
+        window.addEventListener('keypress', (e: KeyboardEvent) => {
+            // TODO: https://stackoverflow.com/questions/5203407/how-to-detect-if-multiple-keys-are-pressed-at-once-using-javascript
             this.onKeyDown(e)
         })
 
         window.addEventListener('keyup', (e: KeyboardEvent) => {
+            // TODO: https://stackoverflow.com/questions/5203407/how-to-detect-if-multiple-keys-are-pressed-at-once-using-javascript
             this.onKeyUp(e)
         })
 
