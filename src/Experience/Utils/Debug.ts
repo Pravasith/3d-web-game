@@ -1,8 +1,9 @@
 import GUI from 'lil-gui'
 
 export default class Debug {
+    protected ui: GUI
+
     private active: boolean = false
-    private ui: GUI
 
     constructor() {
         this.active = window.location.hash === '#debug'

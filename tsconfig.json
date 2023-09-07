@@ -1,0 +1,6 @@
+{
+    "compilerOptions": {
+        "types": ["vite-plugin-glsl/ext"],
+        "isolatedModules": true
+    }
+}
