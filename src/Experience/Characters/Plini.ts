@@ -11,6 +11,7 @@ import Debug from '../Utils/Debug'
 export default class Plini extends Character {
     private debug: Debug
     private debugVars: any
+    private flameMaterial: ShaderMaterial
 
     constructor() {
         const model = Experience.resources.items[LOAD_ITEMS.PLINI_MODEL] as GLTF
@@ -21,7 +22,7 @@ export default class Plini extends Character {
         this.setControls()
 
         const material = new MeshStandardMaterial({ color: '#ffffff' })
-        const shaderMaterial = new ShaderMaterial({
+        this.flameMaterial = new ShaderMaterial({
             vertexShader: FlamesVertexShader,
             fragmentShader: FlamesFragmentShader,
             side: DoubleSide,
@@ -34,13 +35,21 @@ export default class Plini extends Character {
             if (mesh.isMesh) {
                 mesh.material = material
                 if (mesh.name === 'shader-test') {
-                    mesh.material = shaderMaterial
-                    console.log(mesh.geometry.attributes)
+                    mesh.material = this.flameMaterial
                 }
             }
         })
 
         this.debug = new Debug()
         this.debugVars = {}
+
+        this.flameMaterial.uniforms.uTime = { value: null }
+    }
+
+    update() {
+        super.update()
+
+        // Update Shaders
+        this.flameMaterial.uniforms.uTime.value = this.time.elapsed
     }
 }

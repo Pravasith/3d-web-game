@@ -1,6 +1,8 @@
 {
     "compilerOptions": {
         "types": ["vite-plugin-glsl/ext"],
-        "isolatedModules": true
+        "isolatedModules": true,
+        "target": "ESNext",
+        "module": "ESNext"
     }
 }

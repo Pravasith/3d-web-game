@@ -1,3 +1,4 @@
+uniform float uTime;
 varying vec2 vUv;
 
 //	Classic Perlin 2D Noise 
@@ -40,7 +41,8 @@ float cnoise(vec2 P){
 }
 
 void main() {
-  float c = cnoise(vUv.xy * 10.);
+  float c = cnoise(vUv.xy * 10. + uTime * 0.005);
 
   gl_FragColor = vec4(.0, c, c, c + vUv.x);
 }
+

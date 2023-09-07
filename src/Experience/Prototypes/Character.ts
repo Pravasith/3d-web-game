@@ -8,13 +8,13 @@ import { PI, TAU } from '../constants/mathConstants'
 import Helpers from '../Helpers'
 
 export default class Character {
-    model: GLTF
-    modelRotation_y: number
+    protected model: GLTF
+    protected modelRotation_y: number
+    protected time: Time
 
     private scene: THREE.Scene
     private camera: THREE.PerspectiveCamera
     private controls: Controls
-    private time: Time
     private tween: Tween
 
     private temp = 0.2
@@ -67,7 +67,6 @@ export default class Character {
         this.camera.getWorldDirection(this.CameraDir_v3)
 
         this.tween = new Tween()
-        this.debug = Experience.debug
     }
 
     setModel(model: GLTF) {
