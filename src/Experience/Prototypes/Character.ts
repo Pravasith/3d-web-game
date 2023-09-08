@@ -47,7 +47,7 @@ export default class Character {
     private ModelForwardDir_v3_world: THREE.Vector3
     private ModelOrigin_v3_world: THREE.Vector3
 
-    constructor() {
+    protected constructor() {
         this.scene = Experience.scene
         this.time = Experience.time
         this.camera = Experience.camera.instance
@@ -69,7 +69,7 @@ export default class Character {
         this.tween = new Tween()
     }
 
-    setModel(model: GLTF) {
+    protected setModel(model: GLTF) {
         if (!model) {
             throw new Error('Oops! Forgot to pass the model?')
         } else {
@@ -86,33 +86,77 @@ export default class Character {
         }
     }
 
-    onMouseMove(e: MouseEvent) {
-        this.tween.debounce(
-            6,
-            () => {
-                // Character Rotation
-                this.anchor.rotation.y =
-                    (this.anchor.rotation.y - e.movementX * 0.0001 * this.time.delta) % TAU
+    protected setControls() {
+        if (!this.model) {
+            throw new Error('Oops! You need to call the setModel first')
+        } else {
+            this.anchor = new THREE.Object3D()
+            this.anchor.position.set(0, 0, 0)
 
-                // this.anchor.rotation.y = THREE.MathUtils.damp(
-                //     this.anchor.rotation.y,
-                //     this.anchor.rotation.y - e.movementX * 0.0025,
-                //     2,
-                //     this.time.delta * 100
-                // )
+            this.scene.add(this.anchor)
 
-                this.anchor.rotation.x = THREE.MathUtils.damp(
-                    this.anchor.rotation.y,
-                    this.anchor.rotation.x + e.movementY * 0.001,
-                    2,
-                    this.time.delta
-                )
-            },
-            'rotate-character'
-        )
+            // Parent camera to anchor
+            this.anchor.add(this.camera)
+            this.anchor.rotation.order = 'YXZ'
+
+            this.controls = new Controls()
+            this.controls.setControls((e: MouseEvent) => this.onMouseMove(e))
+
+            // Move forward
+            this.controls.on('w_pressed', () => {
+                this.moveForwardOrBackward(1)
+                this.onMoveForwardStart()
+            })
+
+            this.controls.on('w_released', () => {
+                this.A_v2.x = 0
+                this.A_v2.y = 0
+
+                this.onMoveForwardEnd()
+            })
+
+            // Move backward
+            this.controls.on('s_pressed', () => {
+                this.moveForwardOrBackward(-1)
+                this.onMoveBackwardStart()
+            })
+
+            this.controls.on('s_released', () => {
+                this.A_v2.x = 0
+                this.A_v2.y = 0
+
+                this.onMoveBackwardEnd()
+            })
+
+            // Move left
+            this.controls.on('a_pressed', () => {
+                this.moveLeftOrRight(1)
+                this.onMoveLeftStart()
+            })
+
+            this.controls.on('a_released', () => {
+                this.A_v2.x = 0
+                this.A_v2.y = 0
+
+                this.onMoveLeftEnd()
+            })
+
+            // Move backward
+            this.controls.on('d_pressed', () => {
+                this.moveLeftOrRight(-1)
+                this.onMoveRightStart()
+            })
+
+            this.controls.on('d_released', () => {
+                this.A_v2.x = 0
+                this.A_v2.y = 0
+
+                this.onMoveRightEnd()
+            })
+        }
     }
 
-    update() {
+    protected update() {
         this.V_v2.add(this.A_v2.clampLength(-this.max_velocity, this.max_velocity))
 
         this.V_v2.sub(
@@ -163,7 +207,43 @@ export default class Character {
         this.ModelDir_v2.normalize()
     }
 
-    moveForwardOrBackward(dir: 1 | -1) {
+    protected onMoveForwardStart() {}
+    protected onMoveBackwardStart() {}
+    protected onMoveLeftStart() {}
+    protected onMoveRightStart() {}
+
+    protected onMoveForwardEnd() {}
+    protected onMoveBackwardEnd() {}
+    protected onMoveLeftEnd() {}
+    protected onMoveRightEnd() {}
+
+    private onMouseMove(e: MouseEvent) {
+        this.tween.debounce(
+            6,
+            () => {
+                // Character Rotation
+                this.anchor.rotation.y =
+                    (this.anchor.rotation.y - e.movementX * 0.0001 * this.time.delta) % TAU
+
+                // this.anchor.rotation.y = THREE.MathUtils.damp(
+                //     this.anchor.rotation.y,
+                //     this.anchor.rotation.y - e.movementX * 0.0025,
+                //     2,
+                //     this.time.delta * 100
+                // )
+
+                this.anchor.rotation.x = THREE.MathUtils.damp(
+                    this.anchor.rotation.y,
+                    this.anchor.rotation.x + e.movementY * 0.001,
+                    2,
+                    this.time.delta
+                )
+            },
+            'rotate-character'
+        )
+    }
+
+    private moveForwardOrBackward(dir: 1 | -1) {
         // Character Translation
         this.CameraDir_v2.multiplyScalar(dir)
 
@@ -191,7 +271,7 @@ export default class Character {
         )
     }
 
-    moveLeftOrRight(dir: 1 | -1) {
+    private moveLeftOrRight(dir: 1 | -1) {
         // Rotate a vector by 90 degrees trick
         // See - https://limnu.com/sketch-easy-90-degree-rotate-vectors/
         this.CameraDirPlus90_v2.x = dir * this.CameraDir_v2.y
@@ -220,63 +300,5 @@ export default class Character {
             },
             'character-lerp-' + (!(dir + 1) ? 'd' : 'a')
         )
-    }
-
-    setControls() {
-        if (!this.model) {
-            throw new Error('Oops! You need to call the setModel first')
-        } else {
-            this.anchor = new THREE.Object3D()
-            this.anchor.position.set(0, 0, 0)
-
-            this.scene.add(this.anchor)
-
-            // Parent camera to anchor
-            this.anchor.add(this.camera)
-            this.anchor.rotation.order = 'YXZ'
-
-            this.controls = new Controls()
-            this.controls.setControls((e: MouseEvent) => this.onMouseMove(e))
-
-            // Move forward
-            this.controls.on('w_pressed', () => {
-                this.moveForwardOrBackward(1)
-            })
-
-            this.controls.on('w_released', () => {
-                this.A_v2.x = 0
-                this.A_v2.y = 0
-            })
-
-            // Move backward
-            this.controls.on('s_pressed', () => {
-                this.moveForwardOrBackward(-1)
-            })
-
-            this.controls.on('s_released', () => {
-                this.A_v2.x = 0
-                this.A_v2.y = 0
-            })
-
-            // Move left
-            this.controls.on('a_pressed', () => {
-                this.moveLeftOrRight(1)
-            })
-
-            this.controls.on('a_released', () => {
-                this.A_v2.x = 0
-                this.A_v2.y = 0
-            })
-
-            // Move backward
-            this.controls.on('d_pressed', () => {
-                this.moveLeftOrRight(-1)
-            })
-
-            this.controls.on('d_released', () => {
-                this.A_v2.x = 0
-                this.A_v2.y = 0
-            })
-        }
     }
 }
