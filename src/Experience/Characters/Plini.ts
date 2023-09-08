@@ -34,7 +34,7 @@ export default class Plini extends Character {
 
             if (mesh.isMesh) {
                 mesh.material = material
-                if (mesh.name === 'shader-test') {
+                if (mesh.name.includes('flame')) {
                     mesh.material = this.flameMaterial
                 }
             }

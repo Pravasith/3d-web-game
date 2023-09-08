@@ -41,8 +41,20 @@ float cnoise(vec2 P){
 }
 
 void main() {
-  float c = cnoise(vUv.xy * 10. + uTime * 0.005);
+  float mul = 1.;
 
-  gl_FragColor = vec4(.0, c, c, c + vUv.x);
+  float c = abs(cnoise(
+    vec2(
+      vUv.x * mul,
+      vUv.y * mul 
+      - uTime * 0.01
+    )
+  ));
+
+  float m = .4;
+
+  gl_FragColor = vec4(c, c + m + vUv.x, c + m,  
+  -vUv.y + c + m
+  );
 }
 
