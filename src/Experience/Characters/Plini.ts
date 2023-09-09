@@ -96,7 +96,7 @@ export default class Plini extends Character {
     }
 
     private startFlames() {
-        if (this.flames.length) {
+        if (this.flames.length && this.model) {
             this.flames.forEach(mesh => {
                 mesh.rotation.x = THREE.MathUtils.damp(
                     mesh.rotation.x,
@@ -105,14 +105,28 @@ export default class Plini extends Character {
                     this.time.delta * 0.01
                 )
             })
+
+            this.model.scene.rotation.x = THREE.MathUtils.damp(
+                this.model.scene.rotation.x,
+                PI / 8,
+                2,
+                this.time.delta * 0.01
+            )
         }
     }
 
     private restFlames() {
-        if (this.flames.length) {
+        if (this.flames.length && this.model) {
             this.flames.forEach(mesh => {
                 mesh.rotation.x = THREE.MathUtils.damp(mesh.rotation.x, 0, 2, this.time.delta)
             })
+
+            this.model.scene.rotation.x = THREE.MathUtils.damp(
+                this.model.scene.rotation.x,
+                0,
+                2,
+                this.time.delta * 1
+            )
         }
     }
 }
