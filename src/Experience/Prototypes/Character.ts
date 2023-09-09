@@ -11,6 +11,9 @@ export default class Character {
     protected model: GLTF
     protected modelRotation_y: number
     protected time: Time
+    protected S_v2: THREE.Vector2 // Displacement
+    protected V_v2: THREE.Vector2 // Velocity
+    protected A_v2: THREE.Vector2 // Acceleration
 
     private scene: THREE.Scene
     private camera: THREE.PerspectiveCamera
@@ -26,11 +29,7 @@ export default class Character {
     private turnDuration = 400 // 800
     private turnDampFactor = 6
 
-    private S_v2: THREE.Vector2 // Displacement
-    private V_v2: THREE.Vector2 // Velocity
-    private A_v2: THREE.Vector2 // Acceleration
-
-    private anchor: THREE.Object3D
+    protected anchor: THREE.Object3D
 
     private CameraDir_v3: THREE.Vector3
 
@@ -97,7 +96,9 @@ export default class Character {
 
             // Parent camera to anchor
             this.anchor.add(this.camera)
+
             this.anchor.rotation.order = 'YXZ'
+            this.model.scene.rotation.order = 'YXZ'
 
             this.controls = new Controls()
             this.controls.setControls((e: MouseEvent) => this.onMouseMove(e))
@@ -182,6 +183,7 @@ export default class Character {
         this.anchor.position.copy(this.model.scene.position)
 
         this.camera.getWorldDirection(this.CameraDir_v3)
+
         this.CameraDir_v2.x = this.CameraDir_v3.x
         this.CameraDir_v2.y = this.CameraDir_v3.z
         this.CameraDir_v2.normalize()
